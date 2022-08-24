@@ -1,0 +1,470 @@
+# Tangram Satellite Street Style
+# Copyright (C) 2016  Carlo Palermo
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+global:
+    # Satellite basemap tile service
+    #sat_url: 'https://1.aerial.maps.api.here.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/512/jpg?lg=eng&token=A7tBPacePg9Mj_zghvKt9Q&app_id=KuYppsdXZznpffJsKT24'
+    #sat_url: 'http://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=df26d58f8663464768151a411c15c35b'
+    ###开源免费
+    sat_url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+
+    # OpenStreetMap vector tile service
+    #osm_url: 'https://tile.nextzen.org/tilezen/vector/v1/all/{z}/{x}/{y}.mvt'
+    osm_url: 'https://tile.nextzen.org/tilezen/vector/v1/256/all/{z}/{x}/{y}.mvt'
+    sdk_api_key: ''
+    # Layers draw
+    labels_overlay: true
+    roads_overlay: true
+
+settings:
+    localization:
+        #- &text_loc_country function() { return feature["name"]; }
+        - &text_loc_country function() { return feature["name:en"] || feature["name"]; }
+    labels:
+        - &text_size_small  11.0px
+        - &text_size_medium 12.0px
+        - &text_size_big    15.0px
+        - &text_family_places Arial
+        - &text_family_water  Arial
+        - &text_fill_places [1, 1, 1]
+        - &text_fill_water  [.65, 1, .95]
+        - &text_stroke_places { color: [0, 0, 0], width: 2 }
+        - &text_stroke_water  { color: [0, 0, 0], width: 2 }
+    orders:
+    # order vars: "text-[order,buffer]-{layer}" ; "lines-order-{layer}"
+        - &raster_order 0
+        - &lines_order_boundaries function() { return feature.sort_rank; }
+        - &lines_order_water      function() { return feature.sort_rank; }
+#        - &lines_order_roads      function() { return feature.sort_rank; }
+#        - &lines_order_roads      400
+        - &text_order_places 2
+        - &text_order_water  1
+        - &text_buffer_places 25px
+        - &text_buffer_water  15px
+    exceptions:
+        - &small_country [Luxembourg, Liechtenstein, San Marino, Città del Vaticano, Andorra, Jersey, Guernsey]
+        - &small_locality [farm, hamlet, isolated_dwelling]
+
+##=========================================================================
+sources:
+    sat:
+        type: Raster
+        url: global.sat_url
+#    osm:
+#        type: MVT
+#        url: global.osm_url
+#        url_params:
+#            api_key: global.sdk_api_key
+
+##=========================================================================
+styles:
+    sat-raster:
+        base: raster
+    osm-lines:
+        base: lines
+    osm-lines-overlay:
+        base: lines
+        blend: overlay
+        blend_order: 0 # under text
+    osm-text:
+        base: text
+    osm-text-overlay:
+        base: text
+        blend: overlay
+        blend_order: 1 # over lines
+
+scene:
+    background:
+        color: [.75, .75, .75]
+
+##=========================================================================
+layers:
+    terrain:
+        enabled: true
+        data: { source: sat }
+        draw:
+            sat-raster:
+                order: *raster_order
+
+##=========================================================================
+    boundaries:
+        enabled: global.labels_overlay
+        data: { source: osm }
+        adminlines_0:
+            filter:
+                kind: country
+            draw:
+                osm-lines:
+                    order: *lines_order_boundaries
+                    width: 2.5px
+                    color: [.75, .75, .75, .375]
+        adminlines_1:
+            filter:
+                kind: region
+                $zoom: { min: 9 }
+            draw:
+                osm-lines:
+                    order: *lines_order_boundaries
+                    width: 1.5px
+                    color: [.75, .75, .75, .375]
+
+##=========================================================================
+    places:
+        enabled: global.labels_overlay
+        data: { source: osm }
+        countries_0:
+            filter:
+                kind: [country]
+                name: true
+                $zoom: { max: 7 }
+            draw:
+                osm-text-overlay:
+                    order: *text_order_places
+                    buffer: *text_buffer_places
+                    text_source: *text_loc_country
+                    visible: true
+                    font:
+                        size: *text_size_big
+                        weight: bold
+                        transform: uppercase
+                        family: *text_family_places
+                        fill: *text_fill_places
+                        stroke: *text_stroke_places
+            countries_nodraw:
+                filter:
+                    name: *small_country
+                draw:
+                    osm-text-overlay:
+                        visible: false
+        countries_1:
+            filter:
+                kind: [country]
+                name: true
+                $zoom: { min: 7, max: 9 }
+            draw:
+                osm-text-overlay:
+                    order: *text_order_places
+                    buffer: *text_buffer_places
+                    text_source: *text_loc_country
+                    visible: true
+                    font:
+                        size: *text_size_big
+                        weight: bold
+                        transform: uppercase
+                        family: *text_family_places
+                        fill: *text_fill_places
+                        stroke: *text_stroke_places
+        countries_2:
+            filter:
+                kind: [country]
+                name: *small_country
+                $zoom: { min: 9, max: 13 }
+            draw:
+                osm-text-overlay:
+                    order: *text_order_places
+                    buffer: *text_buffer_places
+                    text_source: *text_loc_country
+                    visible: true
+                    font:
+                        size: *text_size_big
+                        weight: bold
+                        transform: uppercase
+                        family: *text_family_places
+                        fill: *text_fill_places
+                        stroke: *text_stroke_places
+        admin_0:
+            filter:
+                kind: region
+                name: true
+                $zoom: { min: 9 }
+            draw:
+                osm-text-overlay:
+                    order: *text_order_places
+                    buffer: *text_buffer_places
+                    visible: true
+                    font:
+                        size: *text_size_medium
+                        weight: bold
+                        transform: uppercase
+                        family: *text_family_places
+                        fill: *text_fill_places
+                        stroke: *text_stroke_places
+        locality_0:
+            filter:
+                kind: locality
+                name: true
+            draw:
+                osm-text-overlay:
+                    order: *text_order_places
+                    #blend_order: *text_order_places #?
+                    buffer: *text_buffer_places
+                    visible: true
+                    font:
+                        size: *text_size_small
+                        weight: bold
+                        family: *text_family_places
+                        fill: *text_fill_places
+                        stroke: *text_stroke_places
+            # no draw minor localities under z15
+            locality_nodraw:
+                filter:
+                    kind_detail: *small_locality
+                    $zoom: { max: 15 }
+                draw:
+                    osm-text-overlay:
+                        visible: false
+
+##=========================================================================
+    water:
+        enabled: global.labels_overlay
+        data: { source: osm }
+        waterlines_0:
+            filter:
+                kind: ocean
+                $zoom: { max: 9 }
+            draw:
+                osm-lines-overlay:
+                    order: *lines_order_water
+                    width: 2.0px
+                    color: |
+                        function() {
+                            var a = 1 - ($zoom / 16)
+                            return [0, .5, .6, a];
+                        }
+        waterlines_1:
+            filter:
+                kind: lake
+            draw:
+                osm-lines-overlay:
+                    order: *lines_order_water
+                    width: 1.0px
+                    color: |
+                        function() {
+                            var a = 1 - ($zoom / 16)
+                            return [0, .5, .6, a];
+                        }
+        waterlines_2:
+            filter:
+                kind: [river, water]
+            draw:
+                osm-lines-overlay:
+                    order: *lines_order_water
+                    width: 1.0px
+                    color: |
+                        function() {
+                            var a = 1 - ($zoom / 16)
+                            return [0, .5, .6, a];
+                        }
+        waterlines_3:
+            filter:
+                kind: canal
+                $zoom: { min: 11 }
+            draw:
+                osm-lines-overlay:
+                    order: *lines_order_water
+                    width: 1.0px
+                    color: |
+                        function() {
+                            var a = 1 - ($zoom / 16)
+                            return [0, .5, .6, a];
+                        }
+        waternames_0:
+            filter:
+                kind: [ocean, sea]
+            draw:
+                osm-text-overlay:
+                    order: *text_order_water
+                    buffer: *text_buffer_water
+                    font:
+                        size: *text_size_medium
+                        weight: bold
+                        transform: uppercase
+                        family: *text_family_water
+                        fill: *text_fill_water
+                        stroke: *text_stroke_water
+        waternames_1:
+            filter:
+                all:
+                    - kind: lake
+                any:
+                    - { $zoom: { min: 6 },  area: { min: 200000000 } }
+                    - { $zoom: { min: 7 },  area: { min: 100000000 } }
+                    - { $zoom: { min: 8 },  area: { min: 50000000 } }
+                    - { $zoom: { min: 9 },  area: { min: 25000000 } }
+                    - $zoom: { min: 10, max: 16 } ## ??
+            draw:
+                osm-text-overlay:
+                    order: *text_order_water
+                    buffer: *text_buffer_water
+                    font:
+                        size: *text_size_small
+                        weight: bold
+                        transform: uppercase
+                        family: *text_family_water
+                        fill: *text_fill_water
+                        stroke: *text_stroke_water
+        waternames_2:
+            filter:
+                kind: river
+                $zoom: { min: 10 }
+            draw:
+                osm-text-overlay:
+                    order: *text_order_water
+                    buffer: *text_buffer_water
+                    font:
+                        size: *text_size_small
+                        family: *text_family_water
+                        fill: *text_fill_water
+                        stroke: *text_stroke_water
+        waternames_3:
+            filter:
+                kind: canal
+                $zoom: { min: 12 }
+            draw:
+                osm-text-overlay:
+                    order: *text_order_water
+                    #blend_order: *text_order_water #?
+                    buffer: *text_buffer_water
+                    font:
+                        size: *text_size_small
+                        family: *text_family_water
+                        fill: *text_fill_water
+                        stroke: *text_stroke_water
+
+##=========================================================================
+    roads:
+        enabled: global.roads_overlay
+        data: { source: osm, layer: roads }
+        filter: { not: { highway: service, kind: rail } }
+        draw:
+            osm-lines:
+                order: function() { return feature.sort_rank; }
+                color: [0.83, 0.83, 0.83]
+                width: function () { return Math.log($zoom); }
+                outline:
+                    color: black
+
+        # default outlines starting at zoom 16
+        default-outline-width:
+            filter: { $zoom: { min: 16 } }
+            draw:
+                osm-lines:
+                    outline:
+                        order: 352
+                        width: function () { return 3/16 * Math.log($zoom); }
+
+        highway:
+            filter:
+                kind: highway
+                $zoom: { min: 8 }
+            draw:
+                osm-lines:
+                    # put highways on top of all other roads as default order
+                    order: 400
+                    color: [1.0, .8, .0]
+                    width: [[11, 2px], [14, 3px], [16, 4px], [17, 10m]]
+                    outline:
+                        color: black
+                        width: [[10, 0], [12, 1px], [16, 2px]]
+            link:
+                filter: { is_link: true } # on- and off-ramps, etc
+                draw:
+                    osm-lines:
+                        color: [0.65882, 0.65882, 0.50196]
+                        width: [[13, 0px], [14, 3px], [16, 5px], [18, 10m]]
+                        outline:
+                            color: [.3, .3, .3]
+                            width: [[13, 0px], [14, 1px], [18, 1.5px]]
+                tunnel-link:
+                    filter: {is_tunnel: true, $zoom: {min: 13} }
+                    draw:
+                        osm-lines:
+                            color: [0.8, 0.8, 0.7]
+                            outline:
+                                color: [.5, .5, .5]
+            tunnel:
+                filter: {is_tunnel: true, $zoom: {min: 13} }
+                draw:
+                    osm-lines:
+                        color: [0.8, 0.8, 0.7]
+                        outline:
+                            color: [.5, .5, .5]
+
+        major_road:
+            filter: { kind: major_road }
+            # default style
+            draw:
+                osm-lines:
+                    color: [[13, [0.8, 0.8, 0.8]], [17, [1, 1, 1]]]
+                    width: [[13, 0px], [14, 2px], [16, 2.5px], [19, 8m]]
+                    outline:
+                        width: [[12, 0px], [13, .5px], [15, 1px]]
+            primary:
+                filter: { highway: primary }
+                draw:
+                    osm-lines:
+                        width: [[10, 0px], [11, 1.5px], [13, 2.5px], [16, 2.5px], [19, 8m]]
+                        outline:
+                            width: [[10, 0px], [11, .5px], [16, .75px]]
+            secondary:
+                filter: { highway: secondary }
+                draw:
+                    osm-lines:
+                        width: [[11, 0px], [13, 1.5px], [14, 2.5px], [16, 2.5px], [19, 8m]]
+                        outline:
+                            width: [[13, 0px], [14, 1.5px]]
+            tertiary:
+                filter: { highway: tertiary }
+                draw:
+                    osm-lines:
+                        width: [[11, 0px], [13, .75px], [14, 2.5px], [16, 2.5px], [19, 8m]]
+                        outline:
+                            width: [[12, 0px], [15, .5px], [16, 1.25px], [18, 4.5px]]
+
+        minor_road:
+            filter: { kind: minor_road, not: { highway: service } }
+            draw:
+                osm-lines:
+                    color: [[15, [0.6, 0.6, 0.6]], [17, [0.8, 0.8, 0.8]]]
+                    width: [[13, 0px], [14, 1.5px], [15, 3px], [16, 5m]]
+                    outline:
+                        width: [[12, 0px], [14, .5px], [17, 1px]]
+
+        path:
+            filter: { kind: path }
+            draw:
+                osm-lines:
+                    color: [0.8, 0.8, 0.8]
+                    width: [[16, 0], [17, 3m]]
+                    outline:
+                        width: .1
+
+        z-order:
+            filter: { $zoom: {min: 14} }
+            draw:
+                osm-lines:
+                    # let roads sort themselves past zoom 14
+                    order: function() { return feature.sort_rank; }
+                    # but give them all the same outline
+                    outline:
+                        order: 352 # magic number
+
+            bridges-tunnels:
+                filter: { any: [is_bridge: true, is_tunnel: true] }
+                draw:
+                    osm-lines:
+                        outline:
+                            # except bridges and tunnels, their outlines should also self-sort
+                            order: function() { return feature.sort_rank; }
