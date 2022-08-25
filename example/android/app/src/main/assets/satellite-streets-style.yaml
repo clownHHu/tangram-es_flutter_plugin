@@ -16,10 +16,14 @@
 global:
     # Satellite basemap tile service
     #sat_url: 'https://1.aerial.maps.api.here.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/512/jpg?lg=eng&token=A7tBPacePg9Mj_zghvKt9Q&app_id=KuYppsdXZznpffJsKT24'
-    #sat_url: 'http://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=df26d58f8663464768151a411c15c35b'
+    #天地图 x,y,z不匹配，看不见图
+    #sat_url: 'http://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&tk=df26d58f8663464768151a411c15c35b'
     ###开源免费
-    sat_url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    #sat_url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 
+    #mapbox
+    sat_url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.png?access_token=sk.eyJ1IjoiY2xvd25odSIsImEiOiJjbDc3dmlsYzAwM3VlNDFveHR3a3lnMm80In0.tEDQtFbFe78jKeBPSHGTmg'
+    #sat_url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.png?access_token=pk.eyJ1IjoiY2xvd25odSIsImEiOiJjbDc3dmhsa3MwM3BkM3JwZ3lkMDZmZ3RxIn0.W_9ZhC7KzIWckTcERniHAw'
     # OpenStreetMap vector tile service
     #osm_url: 'https://tile.nextzen.org/tilezen/vector/v1/all/{z}/{x}/{y}.mvt'
     osm_url: 'https://tile.nextzen.org/tilezen/vector/v1/256/all/{z}/{x}/{y}.mvt'
