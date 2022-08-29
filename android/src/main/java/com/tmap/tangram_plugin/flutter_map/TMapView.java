@@ -67,6 +67,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     private Context context;
     private boolean disposed = false;
     boolean flag=false;
+    boolean timeflag=false;
     private Marker marker;
     //声明AMapLocationClient类对象
     private AMapLocationClient mlocationClient = null;
@@ -286,10 +287,12 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date date = new Date(amapLocation.getTime());
                 //System.out.println("定位时间:"+df.format(date));//定位时间
-                Toast.makeText(context,df.format(date),Toast.LENGTH_SHORT).show();
+                if(timeflag)
+                    Toast.makeText(context,df.format(date),Toast.LENGTH_SHORT).show();
                 LngLat lngLat = LngLatConverterUtil.gcj_To_Gps84(amapLocation.getLatitude(), amapLocation.getLongitude());
                 if(!flag) {
                     flag=true;
+                    timeflag=!timeflag;
                     map.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
                 }
                 marker = map.addMarker();

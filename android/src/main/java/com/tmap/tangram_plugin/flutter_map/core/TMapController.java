@@ -58,6 +58,8 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     private static final String CLASS_NAME="MapController";
     private static String NEXTZEN_API_KEY=null;
     private static final String TAG = "TangramDemo";
+    private boolean sceneReady=false;
+    private MethodChannel.Result sceneReadyResult;
 //    private static final String[] SCENE_PRESETS = {
 //            "asset:///satellite-streets-style.yaml",
 //            "asset:///satellite.yaml",
@@ -210,6 +212,11 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     @Override
     public void onSceneReady(int sceneId, SceneError sceneError) {
         //CameraPosition cameraPosition = map.getCameraPosition();
+        sceneReady=true;
+        if (null != sceneReadyResult) {
+            sceneReadyResult.success(null);
+            sceneReadyResult = null;
+        }
         System.out.println("onSceneReady回调");
     }
 
@@ -250,6 +257,13 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
             case Const.METHOD_MAP_ADD_MAKR:
                 System.out.println(CLASS_NAME+"do:"+Const.METHOD_MAP_ADD_MAKR);
                 result.success("mark");
+                break;
+            case Const.METHOD_MAP_SCENE_READY:
+                if(sceneReady) {
+                    result.success(null);
+                    return;
+                }
+                sceneReadyResult = result;
                 break;
             default:
                 LogUtil.w(CLASS_NAME, "onMethodCall not find methodId:" + call.method);

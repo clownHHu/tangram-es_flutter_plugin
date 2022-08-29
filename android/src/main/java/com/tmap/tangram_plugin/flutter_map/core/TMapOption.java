@@ -2,6 +2,7 @@ package com.tmap.tangram_plugin.flutter_map.core;
 
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
+import com.mapzen.tangram.CameraPosition;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.SceneUpdate;
 
@@ -9,12 +10,12 @@ import java.util.List;
 
 public class TMapOption {
     private String path;
-    private String key;
+    private String tangramApikey;
+    private String ampApikey;
     private String dataLayer;
     private String pointStylingPath;
     private List<SceneUpdate> sceneUpdates;
-    private LngLat startPoint;
-    private float startZoom;
+    private CameraPosition cameraPosition;
     private float pickRadius;
     private boolean mapChangeListener;
     private boolean labelPickListener;
@@ -134,12 +135,20 @@ public class TMapOption {
         this.path = path;
     }
 
-    public String getKey() {
-        return key;
+    public String getTangramApikey() {
+        return tangramApikey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setTangramApikey(String tangramApikey) {
+        this.tangramApikey = tangramApikey;
+    }
+
+    public String getAmpApikey() {
+        return ampApikey;
+    }
+
+    public void setAmpApikey(String ampApikey) {
+        this.ampApikey = ampApikey;
     }
 
     public List<SceneUpdate> getSceneUpdates() {
@@ -150,19 +159,11 @@ public class TMapOption {
         this.sceneUpdates = sceneUpdates;
     }
 
-    public LngLat getStartPoint() {
-        return startPoint;
+    public CameraPosition getCameraPosition() {
+        return cameraPosition;
     }
 
-    public void setStartPoint(LngLat startPoint) {
-        this.startPoint = startPoint;
-    }
-
-    public float getStartZoom() {
-        return startZoom;
-    }
-
-    public void setStartZoom(float startZoom) {
-        this.startZoom = startZoom;
+    public void setCameraPosition(CameraPosition cameraPosition) {
+        this.cameraPosition = cameraPosition;
     }
 }

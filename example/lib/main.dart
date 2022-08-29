@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:flutter/services.dart';
-import 'package:tangram_plugin/options/camera_position.dart';
-import 'package:tangram_plugin/options/tangram_config.dart';
-import 'package:tangram_plugin/tangram_plugin.dart';
-import 'demo_flutter_tangram.dart';
+import 'package:tangram_plugin/tangram_flutter_base.dart';
+import 'package:tangram_plugin/tangram_flutter_map.dart';
+
+import 'base/configs.dart';
 
 void main() =>runApp(MyApp());
 
@@ -15,9 +13,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 0;
-  TangramPlugin tangramPlugin=TangramPlugin();
-  late TangramView tangramView;
-  TangramConfig tangramConfig=TangramConfig("H5w9GBKJRRKcjlnVXKX4tw");
+  late TangramWidget tmap;
+  late TMapController _mapController;
 
   @override
   void initState() {
@@ -28,8 +25,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    tangramView = TangramView(
-      config: TangramConfig("H5w9GBKJRRKcjlnVXKX4tw"),
+    tmap =TangramWidget(
+      tangramkey:Configs.tangramApiKey,
+      ampApiKey: Configs.amapApiKeys,
+      privacyStatement:Configs.amapPrivacyStatement,
+      onMapCreated: onMapCreated,
     );
     return MaterialApp(
         home:Scaffold(
@@ -50,28 +50,28 @@ class _MyAppState extends State<MyApp> {
   }
   Container _body(){
     return Container(
-        //padding: EdgeInsets.all(50),
+      //padding: EdgeInsets.all(50),
         margin: EdgeInsetsDirectional.only(bottom: 60),
-        child: tangramView
+        child: tmap
     );
   }
   Row _floatingActionButton(){
     return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          FloatingActionButton(child: Text('fly'),
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        FloatingActionButton(child: Text('fly'),
           mini:true,
           onPressed: () async {
-          CameraPosition cameraPosition=CameraPosition(latitude:33,longitude:44);
-          await tangramView.flyToPostion(cameraPosition);
-        //tangramView
-        },),
-          FloatingActionButton(child: Text('loc'),
-              mini:true,
-              onPressed: ()async{
-            await tangramView.flytToLoction();
-          }),
-        ],
+            CameraPosition cameraPosition=const CameraPosition(latlng:LatLng(39.909187, 116.397451),zoom: 15);
+            await _mapController.flyToPostion(cameraPosition);
+            //tangramView
+          },),
+        FloatingActionButton(child: Text('loc'),
+            mini:true,
+            onPressed: ()async{
+              await _mapController.flyToLoction();
+            }),
+      ],
 
     );
   }
@@ -102,11 +102,18 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
       onTap: (int index) {
-      setState(() {
-        _currentIndex = index;
-      });
-    },
+        setState(() {
+          _currentIndex = index;
+        });
+      },
     );
+  }
+
+
+  void onMapCreated(TMapController controller) {
+    setState(() {
+      _mapController = controller;
+    });
   }
 
 

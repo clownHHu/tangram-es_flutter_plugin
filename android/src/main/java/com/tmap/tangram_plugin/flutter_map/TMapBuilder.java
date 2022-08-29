@@ -37,21 +37,22 @@ public class TMapBuilder {
 
             //请求渲染
             TMapController tMapController=tMapView.getMapController();
-            tMapController.setKey(tMapOption.getKey());
+            tMapController.setKey(tMapOption.getTangramApikey());
             tMapController.loadSceneFileAsync(tMapOption.getPath(),tMapOption.getSceneUpdates());
 
             //调用高德定位
-            AMapLocationClient.updatePrivacyShow(context,true,true);
-            AMapLocationClient.updatePrivacyAgree(context,true);
+//            AMapLocationClient.updatePrivacyShow(context,true,true);
+//            AMapLocationClient.updatePrivacyAgree(context,true);
             tMapOption.getaMapLocationClient().setLocationOption(tMapOption.getaMapLocationClientOption());
             tMapView.startLocation(tMapOption.getaMapLocationClient());
 
             /////////////对MapController属性初始化
             tMapController.addDataLayer(tMapOption.getDataLayer());
             tMapController.setpointStylingPath(tMapOption.getPointStylingPath());
-            tMapController.setPoint(tMapOption.getStartPoint());
+            LngLat lngLat=tMapOption.getCameraPosition().getPosition();
+            tMapController.setPoint(lngLat);
 
-            //tMapController.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(tMapOption.getStartPoint(),tMapOption.getStartZoom()));
+
             tMapController.setPickRadius(tMapOption.getPickRadius());
             tMapController.setMapChangeListener(tMapOption.isMapChangeListener());
             tMapController.setLabelPickListener(tMapOption.isLabelPickListener());
@@ -60,16 +61,6 @@ public class TMapBuilder {
             tMapController.setFeaturePickListener(tMapOption.isFeaturePickListener());
             tMapController.setTouchInput(tMapOption.isTouchInput());
 
-
-//            CameraPosition cameraPosition=new CameraPosition();
-//            cameraPosition.latitude=0;
-//            cameraPosition.longitude=0;
-//            cameraPosition.rotation= 0;
-//            cameraPosition.tilt=0;
-//            cameraPosition.zoom=16;
-
-//            CameraPosition cameraPosition=tMapController.getCameraPosition();
-//            tMapController.flyToCameraPosition(cameraPosition);
 
             return tMapView;
         } catch (Exception e) {

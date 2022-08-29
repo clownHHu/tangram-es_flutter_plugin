@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tangram_plugin/tangram_plugin_method_channel.dart';
+import 'package:tangram_plugin/core/tangram_plugin_method_channel.dart';
 
 void main() {
   MethodChannelTangramPlugin platform = MethodChannelTangramPlugin();
