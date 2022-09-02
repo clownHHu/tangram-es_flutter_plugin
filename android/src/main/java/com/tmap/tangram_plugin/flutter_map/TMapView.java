@@ -86,7 +86,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             view.onCreate(new Bundle());
             this.context=context;
             map=view.initMapController(new GLSurfaceViewHolderFactory(), TMapController.getHttpHandler(context));
-            mapController = new TMapController(view, map);
+            mapController = new TMapController(methodChannel,view, map);
 //            markersController = new MarkersController(methodChannel, amap);
 //            polylinesController = new PolylinesController(methodChannel, amap);
 //            polygonsController = new PolygonsController(methodChannel, amap);

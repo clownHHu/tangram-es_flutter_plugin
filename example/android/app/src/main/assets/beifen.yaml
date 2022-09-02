@@ -76,12 +76,12 @@ sources:
 styles:
     sat-raster:
         base: raster
-#    osm-lines:
-#        base: lines
-#    osm-lines-overlay:
-#        base: lines
-#        blend: overlay
-#        blend_order: 0 # under text
+    #    osm-lines:
+    #        base: lines
+    #    osm-lines-overlay:
+    #        base: lines
+    #        blend: overlay
+    #        blend_order: 0 # under text
     osm-text:
         base: text
     osm-text-overlay:
@@ -405,7 +405,7 @@ layers:
                         color: [0.8, 0.8, 0.7]
                         outline:
                             color: [.5, .5, .5]
-#####修改：加了主路名称
+        #####修改：加了主路名称
         major_road:
             filter: { kind: major_road,name: true }
             # default style

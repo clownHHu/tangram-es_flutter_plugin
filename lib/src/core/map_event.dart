@@ -36,8 +36,8 @@ class MapTapEvent extends MapEvent<LatLng> {
 }
 
 ///长按地图回调
-class MapLongPressEvent extends MapEvent<LatLng> {
-  MapLongPressEvent(LatLng value) : super(value);
+class MapLongPressEvent extends MapEvent<String> {
+  MapLongPressEvent(String result) : super(result);
 }
 
 /// 带位置回调的地图事件

@@ -8,8 +8,9 @@ package com.tmap.tangram_plugin.flutter_map.tool;
  */
 public class Const {
     /**
-     * map
+     * flutter method
      */
+
     public static final String METHOD_MAP_SCENE_READY ="map#sceneReady";
     public static final String METHOD_MAP_ADD_MAKR = "map#addMark";
     public static final String METHOD_MAP_FLY_CAMERA = "map#flyCamera";
@@ -20,10 +21,24 @@ public class Const {
 
     };
 
-    public static final String METHOD_VIEW_FLY_LOCATION= "map#flyLoction";
+    public static final String METHOD_VIEW_FLY_LOCATION= "view#flyLoction";
+    public static final String METHOD_VIEW_LOCATION_CHANGED= "view#locationChanged";
     public static final String[] METHOD_ID_LIST_FOR_VIEW = {
-            METHOD_VIEW_FLY_LOCATION
+            METHOD_VIEW_FLY_LOCATION,
+            METHOD_VIEW_LOCATION_CHANGED
     };
+
+    /**
+     * flutter callback
+     */
+
+    public static final String METHOD_MAP_ON_LONG_PRESS = "map#onLongPress";
+    public static final String METHOD_MAP_ON_TAP = "map#onTap";
+    public static final String METHOD_CAMERA_ON_MOVE="camera#onMove";
+    public static final String METHOD_CAMERA_ON_MOVE_END="camera#onMoveEnd";
+
+
+
 
 
 }

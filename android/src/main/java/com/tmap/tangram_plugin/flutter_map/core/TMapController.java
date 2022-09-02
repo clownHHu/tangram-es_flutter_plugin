@@ -34,7 +34,6 @@ import com.mapzen.tangram.networking.HttpHandler;
 import com.tmap.tangram_plugin.flutter_map.MyMethodCallHandler;
 import com.tmap.tangram_plugin.flutter_map.tool.Const;
 import com.tmap.tangram_plugin.flutter_map.tool.LogUtil;
-import com.tmap.tangram_plugin.flutter_map.tool.PresetSelectionTextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,17 +59,7 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     private static final String TAG = "TangramDemo";
     private boolean sceneReady=false;
     private MethodChannel.Result sceneReadyResult;
-//    private static final String[] SCENE_PRESETS = {
-//            "asset:///satellite-streets-style.yaml",
-//            "asset:///satellite.yaml",
-//            "asset:///huscene.yaml",
-//            "https://www.nextzen.org/carto/bubble-wrap-style/9/bubble-wrap-style.zip",
-//            "https://www.nextzen.org/carto/refill-style/11/refill-style.zip",
-//            "https://www.nextzen.org/carto/walkabout-style/7/walkabout-style.zip",
-//            "https://www.nextzen.org/carto/tron-style/6/tron-style.zip",
-//            "https://www.nextzen.org/carto/cinnabar-style/9/cinnabar-style.zip"
-//    };
-
+    private final MethodChannel methodChannel;
     MapController map;
     MapView view;
     MapData mapData;
@@ -82,7 +71,8 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
 
 
 
-    public TMapController(MapView view,MapController map) {
+    public TMapController(MethodChannel methodChannel,MapView view,MapController map) {
+        this.methodChannel=methodChannel;
         this.view=view;
         this.map=map;
     }
@@ -104,13 +94,24 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
 
     @Override
     public boolean onSingleTapUp(float x, float y) {
+        if (null != methodChannel) {
+            LngLat tappedPoint = map.screenPositionToLngLat(new PointF(x, y));
+            final Map<String, Object> arguments = new HashMap<String, Object>(2);
+            ArrayList<Double> arrayList=new ArrayList<Double>();
+            arrayList.add(tappedPoint.latitude);
+            arrayList.add(tappedPoint.longitude);
+            arguments.put("latLng", arrayList);
+            methodChannel.invokeMethod(Const.METHOD_MAP_ON_TAP, arguments);
+            //LogUtil.i(CLASS_NAME, "onMapClick===>" + arguments);
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean onSingleTapConfirmed(float x, float y) {
         LngLat tappedPoint = map.screenPositionToLngLat(new PointF(x, y));
-
+        CameraPosition cameraPosition=map.getCameraPosition();
         map.pickFeature(x, y);
         map.pickLabel(x, y);
         map.pickMarker(x, y);
@@ -118,7 +119,22 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
         map.updateCameraPosition(CameraUpdateFactory.setPosition(tappedPoint), 1000, new MapController.CameraAnimationCallback() {
             @Override
             public void onFinish() {
-                Log.d("Tangram","finished!");
+                if (null != methodChannel) {
+                    final Map<String, Object> position = new HashMap<String, Object>(2);
+                    ArrayList<Double> arrayList=new ArrayList<Double>();
+                    arrayList.add(tappedPoint.latitude);
+                    arrayList.add(tappedPoint.longitude);
+                    position.put("target", arrayList);
+                    position.put("tilt",cameraPosition.tilt);
+                    position.put("zoom",cameraPosition.zoom);
+                    position.put("rotation",cameraPosition.rotation);
+
+                    final Map<String, Object> arguments = new HashMap<String, Object>(2);
+                    arguments.put("position",position);
+                    methodChannel.invokeMethod(Const.METHOD_CAMERA_ON_MOVE_END, arguments);
+                    //LogUtil.i(CLASS_NAME, "onMapClick===>" + arguments);
+                }
+                //Log.d("Tangram","finished!");
             }
 
             @Override
@@ -158,6 +174,12 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
         mapData.clear();
         showTileInfo = !showTileInfo;
         map.setDebugFlag(MapController.DebugFlag.TILE_INFOS, showTileInfo);
+        if (null != methodChannel) {
+            final Map<String, Object> arguments = new HashMap<String, Object>(2);
+            arguments.put("onLongPress", "clearALL");
+            methodChannel.invokeMethod(Const.METHOD_MAP_ON_LONG_PRESS, arguments);
+            //LogUtil.i(CLASS_NAME, "map#onLongPress===>" + arguments);
+        }
     }
 
     @Override
@@ -224,35 +246,31 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     public void doMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         if(NEXTZEN_API_KEY!=null)
             if (null == view) {
-                LogUtil.w(CLASS_NAME, "onMethodCall amap is null!!!");
+                LogUtil.w(CLASS_NAME, "NEXTZEN_API_KEY is null!!!");
                 return;
             }
         switch (call.method) {
             case Const.METHOD_MAP_FLY_CAMERA:
                 HashMap arguments = (HashMap) call.arguments;
                 HashMap positionMap = (HashMap) arguments.get("cameraPosition");
+
                 CameraPosition cameraPosition1=new CameraPosition();
                 cameraPosition1.longitude= (double) positionMap.get("longitude");
                 cameraPosition1.latitude= (double) positionMap.get("latitude");
                 cameraPosition1.zoom= (float)((double) positionMap.get("zoom"));
                 cameraPosition1.tilt= (float)((double) positionMap.get("tilt"));
                 cameraPosition1.rotation= (float)((double) positionMap.get("rotation"));
-                CameraPosition cameraPosition = map.getCameraPosition();
 
-                if(cameraPosition1.latitude!=-999)
-                    cameraPosition.latitude=cameraPosition1.latitude;
-                if(cameraPosition1.longitude!=-999)
-                    cameraPosition.longitude=cameraPosition1.longitude;
-                if(cameraPosition1.tilt!=-999)
-                    cameraPosition.tilt=cameraPosition1.tilt;
-                if(cameraPosition1.zoom!=-999)
-                    cameraPosition.zoom=cameraPosition1.zoom;
-                if(cameraPosition1.rotation!=-999)
-                    cameraPosition.rotation=cameraPosition1.rotation;
+                CameraPosition cameraPosition = map.getCameraPosition();
+                cameraPosition.latitude=cameraPosition1.latitude;
+                cameraPosition.longitude=cameraPosition1.longitude;
+                cameraPosition.tilt=cameraPosition1.tilt;
+                cameraPosition.zoom=cameraPosition1.zoom;
+                cameraPosition.rotation=cameraPosition1.rotation;
 
                 flyToCameraPosition(cameraPosition);
                 System.out.println((CLASS_NAME+"fly:"));
-                result.success("fly");
+                result.success(null);
                 break;
             case Const.METHOD_MAP_ADD_MAKR:
                 System.out.println(CLASS_NAME+"do:"+Const.METHOD_MAP_ADD_MAKR);
@@ -302,7 +320,23 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
 
                 @Override
                 public void onRegionIsChanging() {
-                    System.out.println(CLASS_NAME+ "On Region Is Changing");
+                    if (null != methodChannel) {
+                        CameraPosition cameraPosition=map.getCameraPosition();
+                        final Map<String, Object> position = new HashMap<String, Object>(2);
+                        ArrayList<Double> arrayList=new ArrayList<Double>();
+                        arrayList.add(cameraPosition.latitude);
+                        arrayList.add(cameraPosition.longitude);
+                        position.put("target", arrayList);
+                        position.put("tilt",cameraPosition.tilt);
+                        position.put("zoom",cameraPosition.zoom);
+                        position.put("rotation",cameraPosition.rotation);
+
+                        final Map<String, Object> arguments = new HashMap<String, Object>(2);
+                        arguments.put("position",position);
+                        methodChannel.invokeMethod(Const.METHOD_CAMERA_ON_MOVE, arguments);
+                        //LogUtil.i(CLASS_NAME, "onMapClick===>" + arguments);
+                    }
+                    //System.out.println(CLASS_NAME+ "On Region Is Changing");
                 }
 
                 @Override
@@ -398,7 +432,22 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
         map.flyToCameraPosition(position,1000, new MapController.CameraAnimationCallback() {
             @Override
             public void onFinish() {
-                System.out.println("flyToCameraPosition finish!");
+                if (null != methodChannel) {
+                    final Map<String, Object> positionmap = new HashMap<String, Object>(2);
+                    ArrayList<Double> arrayList=new ArrayList<Double>();
+                    arrayList.add(position.latitude);
+                    arrayList.add(position.longitude);
+                    positionmap.put("target", arrayList);
+                    positionmap.put("tilt",position.tilt);
+                    positionmap.put("zoom",position.zoom);
+                    positionmap.put("rotation",position.rotation);
+
+                    final Map<String, Object> arguments = new HashMap<String, Object>(2);
+                    arguments.put("position",positionmap);
+                    methodChannel.invokeMethod(Const.METHOD_CAMERA_ON_MOVE_END, arguments);
+                    //LogUtil.i(CLASS_NAME, "onMapClick===>" + arguments);
+                }
+                //System.out.println("flyToCameraPosition finish!");
             }
 
             @Override

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:tangram_plugin/tangram_flutter_base.dart';
 import 'package:tangram_plugin/tangram_flutter_map.dart';
 
-import 'base/configs.dart';
+import 'configs.dart';
 
-void main() =>runApp(MyApp());
+void main() =>runApp( MaterialApp(home:MyApp() ,));
 
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
+
 }
 
 class _MyAppState extends State<MyApp> {
@@ -25,18 +26,26 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final size =MediaQuery.of(context).size;
     tmap =TangramWidget(
       tangramkey:Configs.tangramApiKey,
       ampApiKey: Configs.amapApiKeys,
       privacyStatement:Configs.amapPrivacyStatement,
       onMapCreated: onMapCreated,
+      onLocationChanged: _onLocationChanged,
+      onCameraMove: _onCameraMove,
+      onCameraMoveEnd: _onCameraMoveEnd,
+      onLongPress: _onMapLongPress,
+      onTap: _onMapTap,
     );
     return MaterialApp(
+        title: 'material app',
         home:Scaffold(
           appBar: _appBar(),
-          body: _body(),
+          body: _body(size),
           floatingActionButton: _floatingActionButton(),
-          floatingActionButtonLocation:FloatingActionButtonLocation.startFloat,
+          floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
           bottomNavigationBar:_bottomNavigationBar(),
         ));
   }
@@ -48,11 +57,12 @@ class _MyAppState extends State<MyApp> {
       automaticallyImplyLeading:false,
     );
   }
-  Container _body(){
+  Container _body(Size size){
     return Container(
-      //padding: EdgeInsets.all(50),
-        margin: EdgeInsetsDirectional.only(bottom: 60),
-        child: tmap
+        height: size.height,
+        width: size.width,
+        child: tmap,
+        margin: EdgeInsets.only(bottom: 30),
     );
   }
   Row _floatingActionButton(){
@@ -114,6 +124,26 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _mapController = controller;
     });
+  }
+
+  void _onLocationChanged(AMapLocation location) {
+    print('_onLocationChanged ${location.toJson()}');
+  }
+
+  void _onCameraMove(CameraPosition cameraPosition) {
+    print('onCameraMove===> ${cameraPosition.toMap()}');
+  }
+
+  void _onCameraMoveEnd(CameraPosition cameraPosition) {
+    print('_onCameraMoveEnd===> ${cameraPosition.toMap()}');
+  }
+
+  void _onMapTap(LatLng latLng) {
+    print('_onMapTap===> ${latLng.toJson()}');
+  }
+
+  void _onMapLongPress(String result) {
+    print('_onMapLongPress===> $result');
   }
 
 

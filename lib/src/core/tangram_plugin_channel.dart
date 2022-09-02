@@ -45,7 +45,7 @@ class MethodChannelTangram extends TangramFlutterPlatform{
     await methodChannel.invokeMethod<void>('map#flyCamera',{"cameraPosition":map});
   }
   Future<void> flyToLoction()async{
-    await methodChannel.invokeMethod<void>('map#flyLoction');
+    await methodChannel.invokeMethod<void>('view#flyLoction');
   }
 
   @override
@@ -117,12 +117,12 @@ class MethodChannelTangram extends TangramFlutterPlatform{
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
     switch (call.method) {
-      case 'location#changed':
+      case 'view#locationChanged':
         try {
           _mapEventStreamController.add(LocationChangedEvent(
               AMapLocation.fromMap(call.arguments['location'])!));
         } catch (e) {
-          print("location#changed error=======>" + e.toString());
+          print("view#locationChanged error=======>" + e.toString());
         }
         break;
 
@@ -148,7 +148,7 @@ class MethodChannelTangram extends TangramFlutterPlatform{
         break;
       case 'map#onLongPress':
         _mapEventStreamController.add(MapLongPressEvent(
-            LatLng.fromJson(call.arguments['latLng'])!));
+            call.arguments['onLongPress']!));
         break;
 
       case 'marker#onTap':

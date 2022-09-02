@@ -45,7 +45,7 @@ class TangramWidget extends StatefulWidget{
   /// 地图单击事件的回调
   final ArgumentCallback<LatLng>? onTap;
   /// 地图长按事件的回调
-  final ArgumentCallback<LatLng>? onLongPress;
+  final ArgumentCallback<String>? onLongPress;
   ///位置回调
   final ArgumentCallback<AMapLocation>? onLocationChanged;
 
