@@ -78,7 +78,6 @@ class AMapLocation {
         json[fieldName] = value;
       }
     }
-
     json['latlng'] = latLng.toJson();
     addIfPresent('provider', provider);
     addIfPresent('accuracy', accuracy);
@@ -151,4 +150,9 @@ class LatLng {
 
   @override
   int get hashCode => hashValues(latitude, longitude);
+}
+enum LocationModes{
+  High,
+  Medium,
+  Low
 }

@@ -39,6 +39,7 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -69,6 +70,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     boolean flag=false;
     boolean timeflag=false;
     private Marker marker;
+    private long predate=-1;
     //声明AMapLocationClient类对象
     private AMapLocationClient mlocationClient = null;
 
@@ -268,25 +270,31 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     public void onLocationChanged(AMapLocation amapLocation) {
         if (amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-//                //定位成功回调信息，设置相关消息
-//                amapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
-//                amapLocation.getLatitude();//获取纬度
-//                amapLocation.getLongitude();//获取经度
-//                amapLocation.getAccuracy();//获取精度信息
-//                amapLocation.getAddress();//地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
-//                amapLocation.getCountry();//国家信息
-//                amapLocation.getProvince();//省信息
-//                amapLocation.getCity();//城市信息
-//                amapLocation.getDistrict();//城区信息
-//                amapLocation.getStreet();//街道信息
-//                amapLocation.getStreetNum();//街道门牌号信息
-//                amapLocation.getCityCode();//城市编码
-//                amapLocation.getAdCode();//地区编码
-                //LngLat lngLat0=new LngLat(116.7234192,40.1591512);
-
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                if(predate!=-1&&predate!=amapLocation.getTime())
+                {
+                    if (null != methodChannel) {
+                        final Map<String, Object> location = new HashMap<String, Object>(2);
+                        ArrayList<Double> arrayList=new ArrayList<Double>();
+                        arrayList.add(amapLocation.getLatitude());
+                        arrayList.add(amapLocation.getLongitude());
+                        location.put("latLng", arrayList);
+                        location.put("provider",amapLocation.getProvider());
+                        location.put("accuracy",amapLocation.getAccuracy());
+                        location.put("altitude",amapLocation.getAltitude());
+                        location.put("bearing",amapLocation.getBearing());
+                        location.put("speed",amapLocation.getSpeed());
+                        location.put("time",amapLocation.getTime());
+
+                        final Map<String, Object> arguments = new HashMap<String, Object>(2);
+                        arguments.put("location", location);
+                        methodChannel.invokeMethod(Const.METHOD_VIEW_LOCATION_CHANGED, arguments);
+                    }
+                }
+
                 Date date = new Date(amapLocation.getTime());
-                //System.out.println("定位时间:"+df.format(date));//定位时间
+                predate=amapLocation.getTime();
                 if(timeflag)
                     Toast.makeText(context,df.format(date),Toast.LENGTH_SHORT).show();
                 LngLat lngLat = LngLatConverterUtil.gcj_To_Gps84(amapLocation.getLatitude(), amapLocation.getLongitude());

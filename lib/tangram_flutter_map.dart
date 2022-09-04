@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:tangram_plugin/src/core/map_event.dart';
 import 'package:tangram_plugin/src/core/tangram_plugin_channel.dart';
 import 'package:tangram_plugin/src/core/tangram_plugin_platform.dart';
-import 'package:tangram_plugin/src/option/options.dart';
 import 'package:tangram_plugin/tangram_flutter_base.dart';
 
 

@@ -151,10 +151,7 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
 
         LngLat tapped = map.screenPositionToLngLat(new PointF(x, y));
 
-        Marker p = map.addMarker();
-        p.setStylingFromPath(pointStylingPath);
-        p.setPoint(tapped);
-        pointMarkers.add(p);
+        setPoint(tapped);
 
         CameraPosition camera = map.getCameraPosition();
 
@@ -254,21 +251,14 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
                 HashMap arguments = (HashMap) call.arguments;
                 HashMap positionMap = (HashMap) arguments.get("cameraPosition");
 
-                CameraPosition cameraPosition1=new CameraPosition();
-                cameraPosition1.longitude= (double) positionMap.get("longitude");
-                cameraPosition1.latitude= (double) positionMap.get("latitude");
-                cameraPosition1.zoom= (float)((double) positionMap.get("zoom"));
-                cameraPosition1.tilt= (float)((double) positionMap.get("tilt"));
-                cameraPosition1.rotation= (float)((double) positionMap.get("rotation"));
-
-                CameraPosition cameraPosition = map.getCameraPosition();
-                cameraPosition.latitude=cameraPosition1.latitude;
-                cameraPosition.longitude=cameraPosition1.longitude;
-                cameraPosition.tilt=cameraPosition1.tilt;
-                cameraPosition.zoom=cameraPosition1.zoom;
-                cameraPosition.rotation=cameraPosition1.rotation;
-
+                CameraPosition cameraPosition=new CameraPosition();
+                cameraPosition.longitude= (double) positionMap.get("longitude");
+                cameraPosition.latitude= (double) positionMap.get("latitude");
+                cameraPosition.zoom= (float)((double) positionMap.get("zoom"));
+                cameraPosition.tilt= (float)((double) positionMap.get("tilt"));
+                cameraPosition.rotation= (float)((double) positionMap.get("rotation"));
                 flyToCameraPosition(cameraPosition);
+
                 System.out.println((CLASS_NAME+"fly:"));
                 result.success(null);
                 break;
