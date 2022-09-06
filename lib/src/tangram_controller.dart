@@ -29,6 +29,13 @@ class TMapController{
     return _methodChannel.getChannel();
   }
 
+  void getlocationPermission() async {
+    final status = await Permission.location.status;
+    if(!status.isGranted){
+      Permission.location.request();
+    }
+  }
+
   void _connectStreams() {
     if (_mapState.widget.onLocationChanged != null) {
       _methodChannel
@@ -71,6 +78,8 @@ class TMapController{
   Future<void> flyToLoction(){
     return _methodChannel.flyToLoction();
   }
-
+  Future<void> locationSwitch(){
+    return _methodChannel.locationSwitch();
+  }
 
 }

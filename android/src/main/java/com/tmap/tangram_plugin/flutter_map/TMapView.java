@@ -64,12 +64,10 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     private final MethodChannel methodChannel;
     private TMapController mapController;
     private MapView view;
-    private MapController map;
     private Context context;
     private boolean disposed = false;
     boolean flag=false;
-    boolean timeflag=false;
-    private Marker marker;
+    boolean locationflag=false;
     private long predate=-1;
     //声明AMapLocationClient类对象
     private AMapLocationClient mlocationClient = null;
@@ -87,8 +85,8 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             view = new MapView(context);
             view.onCreate(new Bundle());
             this.context=context;
-            map=view.initMapController(new GLSurfaceViewHolderFactory(), TMapController.getHttpHandler(context));
-            mapController = new TMapController(methodChannel,view, map);
+            //map=view.initMapController(new GLSurfaceViewHolderFactory(), TMapController.getHttpHandler(context));
+            mapController = new TMapController(methodChannel,view, view.initMapController(new GLSurfaceViewHolderFactory(), TMapController.getHttpHandler(context)));
 //            markersController = new MarkersController(methodChannel, amap);
 //            polylinesController = new PolylinesController(methodChannel, amap);
 //            polygonsController = new PolygonsController(methodChannel, amap);
@@ -108,6 +106,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
         this.mlocationClient=mlocationClient;
         this.mlocationClient.setLocationListener(this);
         this.mlocationClient.startLocation();
+        locationflag=true;
     }
 
 
@@ -136,7 +135,6 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                 return;
             }
             methodChannel.setMethodCallHandler(null);
-//            destroyMapViewIfNecessary();
             view=null;
             disposed = true;
         } catch (Throwable e) {
@@ -157,7 +155,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             }
         }
     }
-    public TMapController getMapController() {
+    public TMapController getTMapController() {
         return mapController;
     }
 
@@ -219,6 +217,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             if (null != view) {
                 view.onResume();
                 mlocationClient.startLocation();
+                locationflag=true;
             }
         } catch (Throwable e) {
             LogUtil.e(CLASS_NAME, "onResume", e);
@@ -234,6 +233,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             }
             view.onPause();
             mlocationClient.stopLocation();
+            locationflag=false;
         } catch (Throwable e) {
             LogUtil.e(CLASS_NAME, "onPause", e);
         }
@@ -242,6 +242,16 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     @Override
     public void onStop(@NonNull LifecycleOwner owner) {
         LogUtil.i(CLASS_NAME, "onStop==>");
+        try {
+            if (disposed) {
+                return;
+            }
+            view.onPause();
+            mlocationClient.stopLocation();
+            locationflag=false;
+        } catch (Throwable e) {
+            LogUtil.e(CLASS_NAME, "onStop", e);
+        }
     }
 
     @Override
@@ -295,18 +305,15 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
 
                 Date date = new Date(amapLocation.getTime());
                 predate=amapLocation.getTime();
-                if(timeflag)
+                if(locationflag)
                     Toast.makeText(context,df.format(date),Toast.LENGTH_SHORT).show();
                 LngLat lngLat = LngLatConverterUtil.gcj_To_Gps84(amapLocation.getLatitude(), amapLocation.getLongitude());
                 if(!flag) {
                     flag=true;
-                    timeflag=!timeflag;
-                    map.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
+                    mapController.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
                 }
-                marker = map.addMarker();
-                String pointStyle = "{ style: 'points', color: 'yellow', size: [10px, 10px], order: 2000, collide: false, flat: true }";
-                marker.setStylingFromString(pointStyle);
-                marker.setPoint(lngLat);
+                mapController.addMarkerBySrting(lngLat);
+
             } else {
                 //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
                 Log.e("AmapError","location Error, ErrCode:"
@@ -324,6 +331,17 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             switch (call.method){
                 case Const.METHOD_VIEW_FLY_LOCATION:
                     flag=false;
+                    break;
+                case Const.METHOD_VIEW_LOCATION_SWITCH:
+                    if(locationflag) {
+                        mlocationClient.stopLocation();
+                        Toast.makeText(context,"停止导航",Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        mlocationClient.startLocation();
+                        Toast.makeText(context,"开始导航",Toast.LENGTH_SHORT).show();
+                    }
+                    locationflag=!locationflag;
                     break;
                 default:
                     LogUtil.w(CLASS_NAME, "onMethodCall not find methodId:" + call.method);

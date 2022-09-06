@@ -2,6 +2,7 @@ package com.tmap.tangram_plugin.flutter_map.core;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.util.Log;
 
@@ -60,16 +61,16 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     private boolean sceneReady=false;
     private MethodChannel.Result sceneReadyResult;
     private final MethodChannel methodChannel;
-    MapController map;
-    MapView view;
-    MapData mapData;
-    List<LngLat> tappedPoints = new ArrayList<>();
-    String pointStylingPath;
-    ArrayList<Marker> pointMarkers = new ArrayList<>();
+    private MapController map;
+    private MapView view;
+    private MapData mapData;
+    private Marker marker;
+    private String pointStyle = "{ style: 'points', color: 'yellow', size: [10px, 10px], order: 2000, collide: false, flat: true }";
+    private List<LngLat> tappedPoints = new ArrayList<>();
+    private String pointStylingPath;
+    private ArrayList<Marker> pointMarkers = new ArrayList<>();
     boolean showTileInfo = false;
     private static final String FTAG = "TangramView";
-
-
 
     public TMapController(MethodChannel methodChannel,MapView view,MapController map) {
         this.methodChannel=methodChannel;
@@ -266,6 +267,14 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
                 System.out.println(CLASS_NAME+"do:"+Const.METHOD_MAP_ADD_MAKR);
                 result.success("mark");
                 break;
+            case Const.METHOD_MAP_FRAME_CAPTURE:
+                captureFrame(new MapController.FrameCaptureCallback() {
+                    @Override
+                    public void onCaptured(@NonNull Bitmap bitmap) {
+                        result.success(bitmap);
+                    }
+                },true);
+                break;
             case Const.METHOD_MAP_SCENE_READY:
                 if(sceneReady) {
                     result.success(null);
@@ -283,6 +292,19 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     public  String[] getRegisterMethodIdArray() {
         return Const.METHOD_ID_LIST_FOR_MAP;
     }
+
+    @Override
+    public MapController getMap() {
+        if(map!=null)
+            return map;
+        return null;
+    }
+
+    @Override
+    public void captureFrame(@NonNull MapController.FrameCaptureCallback callback, boolean waitForCompleteView) {
+        map.captureFrame(callback,waitForCompleteView);
+    }
+
 
     @Override
     public void updateCameraPosition(@NonNull final CameraUpdate update) {
@@ -407,15 +429,10 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
         p.setStylingFromPath(pointStylingPath);
         p.setPoint(point);
         pointMarkers.add(p);
+
     }
 
-    @Override
-    public Marker getLocationMarker() {
-        Marker marker = map.addMarker();
-        String pointStyle = "{ style: 'points', color: 'white', size: [20px, 20px], order: 2000, collide: false, flat: true }";
-        marker.setStylingFromString(pointStyle);
-        return marker;
-    }
+
 
     @Override
     public void flyToCameraPosition(@NonNull CameraPosition position){
@@ -450,6 +467,28 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     @Override
     public CameraPosition getCameraPosition() {
         return map.getCameraPosition();
+    }
+
+    @Override
+    public Marker getMarker() {
+        return marker;
+    }
+
+    @Override
+    public MapView getView() {
+        return view;
+    }
+
+    @Override
+    public MapData getMapData() {
+        return mapData;
+    }
+
+    @Override
+    public void addMarkerBySrting(LngLat lngLat) {
+        marker = map.addMarker();
+        marker.setStylingFromString(pointStyle);
+        marker.setPoint(lngLat);
     }
 
 

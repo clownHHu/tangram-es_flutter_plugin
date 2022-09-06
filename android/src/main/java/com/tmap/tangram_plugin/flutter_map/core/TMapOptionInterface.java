@@ -1,6 +1,7 @@
 package com.tmap.tangram_plugin.flutter_map.core;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +14,7 @@ import com.mapzen.tangram.LabelPickResult;
 import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.MapController;
 import com.mapzen.tangram.MapData;
+import com.mapzen.tangram.MapView;
 import com.mapzen.tangram.Marker;
 import com.mapzen.tangram.MarkerPickResult;
 import com.mapzen.tangram.SceneUpdate;
@@ -23,8 +25,8 @@ import java.util.List;
 
 public interface TMapOptionInterface {
 
+
     void updateCameraPosition(@NonNull final CameraUpdate update);
-    void setCameraType(MapController.CameraType cameraType);
     void setMapChangeListener(boolean setListener);
     void setSceneLoadListener(boolean setListener);
     void setTouchInput(boolean setTouchInput);
@@ -36,8 +38,18 @@ public interface TMapOptionInterface {
     void setPickRadius(final float radius);
     void setpointStylingPath(String pointStylingPath);
     void setPoint(LngLat point);
-    Marker getLocationMarker();
     void flyToCameraPosition(CameraPosition position);
+    void addMarkerBySrting(LngLat lngLat);
+
+    void setCameraType(MapController.CameraType cameraType);
     CameraPosition getCameraPosition();
+    Marker getMarker();
+    MapView getView();
+    MapData getMapData();
+    MapController getMap();
+
+    void captureFrame(@NonNull final MapController.FrameCaptureCallback callback, final boolean waitForCompleteView);
+
+
 
 }

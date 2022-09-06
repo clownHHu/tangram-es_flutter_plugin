@@ -36,7 +36,7 @@ public class TMapBuilder {
             final TMapView tMapView = new TMapView(id, context, binaryMessenger, lifecycleProvider);
 
             //请求渲染
-            TMapController tMapController=tMapView.getMapController();
+            TMapController tMapController=tMapView.getTMapController();
             tMapController.setKey(tMapOption.getTangramApikey());
             tMapController.loadSceneFileAsync(tMapOption.getPath(),tMapOption.getSceneUpdates());
 

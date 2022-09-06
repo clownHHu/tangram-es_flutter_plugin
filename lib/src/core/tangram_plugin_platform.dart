@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tangram_plugin/src/core/tangram_plugin_channel.dart';
+import 'package:tangram_plugin/tangram_flutter_base.dart';
 
 abstract class TangramFlutterPlatform extends PlatformInterface {
   static final Object _token = Object();
@@ -25,7 +26,8 @@ abstract class TangramFlutterPlatform extends PlatformInterface {
 
   Widget buildView(
       Map<String, dynamic> creationParams,
-      PlatformViewCreatedCallback onPlatformViewCreated) {
+      PlatformViewCreatedCallback onPlatformViewCreated,
+      {required TangramWidgetConfiguration widgetConfiguration}) {
     throw UnimplementedError('buildView() has not been implemented.');
   }
 }

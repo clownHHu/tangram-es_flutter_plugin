@@ -2,8 +2,11 @@ library tangram_flutter_map;
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tangram_plugin/src/core/map_event.dart';
 import 'package:tangram_plugin/src/core/tangram_plugin_channel.dart';
 import 'package:tangram_plugin/src/core/tangram_plugin_platform.dart';

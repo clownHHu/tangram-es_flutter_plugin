@@ -8,7 +8,6 @@ class MapEvent<T> {
 
   /// 构造一个event
   ///
-  /// `mapId` 当前地图的id
   /// `value` 需要传输的值，可以为`null`.
   MapEvent(this.value);
 }
@@ -47,7 +46,6 @@ class _PositionedMapEvent<T> extends MapEvent<T> {
 
   /// 构造一个带位置的地图事件，
   ///
-  /// `mapId` 当前地图的id
   /// `value` 需要传输的值，可以为`null`.
   _PositionedMapEvent(this.position, T value) : super(value);
 }

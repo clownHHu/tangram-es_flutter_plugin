@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:tangram_plugin/src/core/tangram_plugin_platform.dart';
 import 'package:tangram_plugin/src/tool/stream_where.dart';
@@ -12,6 +14,7 @@ const VIEW_TYPE = 'flutter_map/view';
 class MethodChannelTangram extends TangramFlutterPlatform{
 
   final methodChannel = const MethodChannel('test/channel');
+
 
 
   @override
@@ -47,22 +50,69 @@ class MethodChannelTangram extends TangramFlutterPlatform{
   Future<void> flyToLoction()async{
     await methodChannel.invokeMethod<void>('view#flyLoction');
   }
+  Future<void> frameCapture()async{
+    await methodChannel.invokeMethod('map#frameCapture');
+  }
+  Future<void> locationSwitch()async{
+    await methodChannel.invokeMethod('view#locationSwitch');
+  }
 
   @override
   void dispose() {}
 
+  bool useAndroidViewSurface=true;
+
   @override
   Widget buildView(
       Map<String, dynamic> creationParams,
-      void Function(int id) onPlatformViewCreated) {
+      void Function(int id) onPlatformViewCreated, {
+        required TangramWidgetConfiguration widgetConfiguration,
+      }) {
     if (defaultTargetPlatform == TargetPlatform.android) {
       creationParams['debugMode'] = kDebugMode;
-      return AndroidView(
+      if (useAndroidViewSurface) {
+        return PlatformViewLink(
+          viewType: VIEW_TYPE,
+          surfaceFactory: (
+              BuildContext context,
+              PlatformViewController controller,
+              ) {
+            return AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              gestureRecognizers: widgetConfiguration.gestureRecognizers,
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            final AndroidViewController controller =
+            PlatformViewsService.initExpensiveAndroidView(
+              id: params.id,
+              viewType: VIEW_TYPE,
+              layoutDirection: TextDirection.rtl,
+              creationParams: creationParams,
+              creationParamsCodec: const StandardMessageCodec(),
+              onFocus: () => params.onFocusChanged(true),
+            );
+            controller.addOnPlatformViewCreatedListener(
+              params.onPlatformViewCreated,
+            );
+            controller.addOnPlatformViewCreatedListener(
+              onPlatformViewCreated,
+            );
+
+            controller.create();
+            return controller;
+          },
+        );
+      }
+      else {
+        return AndroidView(
         viewType: VIEW_TYPE,
         onPlatformViewCreated: onPlatformViewCreated,
         creationParams: creationParams,
         creationParamsCodec: const StandardMessageCodec(),
       );
+      }
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: VIEW_TYPE,

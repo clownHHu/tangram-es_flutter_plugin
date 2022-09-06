@@ -88,6 +88,8 @@ styles:
         base: text
         blend: overlay
         blend_order: 1 # over lines
+        # setting up style with default draw size
+
 
 scene:
     background:
@@ -95,6 +97,18 @@ scene:
 
 ##=========================================================================
 layers:
+    touch:
+        point:
+            draw:
+                icons:
+                    style: points
+                    color: white
+                    size: [10px, 10px]
+                    order: 2000
+                    collide: false
+                    flat: true
+
+    #######################################
     terrain:
         enabled: true
         data: { source: sat }

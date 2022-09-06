@@ -15,7 +15,8 @@ class TangramWidget extends StatefulWidget{
   final bool isMarkerPickListener;
   final bool isTouchInput;
   final bool isSceneLoadListener;
-
+  final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
+  final TextDirection? layoutDirection;
   ///高德定位配置
   final LocationModes LocationMode;
   final int interval;
@@ -63,6 +64,8 @@ class TangramWidget extends StatefulWidget{
     this.isMarkerPickListener=true,
     this.isTouchInput=true,
     this.isSceneLoadListener=true,
+    this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
+    this.layoutDirection,
 
     this.LocationMode= LocationModes.High,
     this.privacyStatement,
@@ -102,6 +105,12 @@ class _MapState extends State<TangramWidget>{
     Widget mapView = _methodChannel.buildView(
       creationParams,
       onPlatformViewCreated,
+        widgetConfiguration: TangramWidgetConfiguration(
+          textDirection: widget.layoutDirection ??
+              Directionality.maybeOf(context) ??
+              TextDirection.ltr,
+          gestureRecognizers: widget.gestureRecognizers,
+        )
     );
     return mapView;
   }
@@ -254,6 +263,7 @@ class _tangramConfig {
       return preValue == newValue;
     }
   }
+
 }
 
 

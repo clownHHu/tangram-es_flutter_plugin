@@ -39,6 +39,9 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
        <service android:name="com.amap.api.location.APSService"></service>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCbmV-W-T21F_eN5WfWWrQGqpB8K9kyxJ0"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

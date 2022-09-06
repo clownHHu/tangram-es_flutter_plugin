@@ -128,14 +128,5 @@ public class TangramPlugin implements FlutterPlugin,ActivityAware {
     lifecycle = null;
   }
 
-
-//  @Override
-//  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-//    switch (call.method){
-//      case "a":break;
-//      default:System.out.println(call.method);
-//    }
-//
-//  }
 }
 
