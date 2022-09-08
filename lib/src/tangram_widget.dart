@@ -3,6 +3,8 @@ part of tangram_flutter_map;
 typedef void MapCreatedCallback(TMapController controller);
 
 class TangramWidget extends StatefulWidget{
+  late bool sceneReady;
+
   final TangramApiKey? tangramkey;
   final String scenePath;
   final double pickRadius;
@@ -50,7 +52,7 @@ class TangramWidget extends StatefulWidget{
   ///位置回调
   final ArgumentCallback<AMapLocation>? onLocationChanged;
 
-  const TangramWidget({
+    TangramWidget({
     Key? key,
     this.tangramkey,
     this.scenePath='asset:///satellite-streets-style.yaml',
@@ -79,7 +81,9 @@ class TangramWidget extends StatefulWidget{
     this.onCameraMoveEnd,
     this.onLongPress,
     this.onMapCreated,
-    this.onTap
+    this.onTap,
+
+    this.sceneReady=false
 
   }): super(key: key);
 
@@ -152,6 +156,7 @@ class _MapState extends State<TangramWidget>{
       widget.cameraPosition,
       this,
     );
+    widget.sceneReady=true;
     _controller.complete(controller);
     final MapCreatedCallback? _onMapCreated = widget.onMapCreated;
     if (_onMapCreated != null) {

@@ -15,8 +15,6 @@ class MethodChannelTangram extends TangramFlutterPlatform{
 
   final methodChannel = const MethodChannel('test/channel');
 
-
-
   @override
   MethodChannel getChannel() {
     return this.methodChannel;

@@ -59,7 +59,7 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     private static String NEXTZEN_API_KEY=null;
     private static final String TAG = "TangramDemo";
     private boolean sceneReady=false;
-    private MethodChannel.Result sceneReadyResult;
+    private MethodChannel.Result sceneReadyResult=null;
     private final MethodChannel methodChannel;
     private MapController map;
     private MapView view;
@@ -233,10 +233,10 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
     public void onSceneReady(int sceneId, SceneError sceneError) {
         //CameraPosition cameraPosition = map.getCameraPosition();
         sceneReady=true;
-        if (null != sceneReadyResult) {
-            sceneReadyResult.success(null);
-            sceneReadyResult = null;
-        }
+//        if (null != sceneReadyResult) {
+//            sceneReadyResult.success(null);
+//            sceneReadyResult = null;
+//        }
         System.out.println("onSceneReady回调");
     }
 

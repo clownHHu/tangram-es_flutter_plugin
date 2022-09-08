@@ -3,6 +3,7 @@ part of tangram_flutter_map;
 final MethodChannelTangram _methodChannel = TangramFlutterPlatform.instance as MethodChannelTangram;
 
 class TMapController{
+
   final _MapState _mapState;
 
   TMapController._(CameraPosition initCameraPosition, this._mapState) {
@@ -21,6 +22,7 @@ class TMapController{
       mapState,
     );
   }
+
 
   ///只用于测试
   ///用于与native的通信
