@@ -1,4 +1,4 @@
-part of tangram_flutter_base;
+part of tangram_flutter_ui;
 
 class RowImages extends StatelessWidget {
   RowImages();

@@ -305,7 +305,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
 
                 Date date = new Date(amapLocation.getTime());
                 predate=amapLocation.getTime();
-                if(locationflag)
+                if(!locationflag)
                     System.out.println(df.format(date));
                 LngLat lngLat = LngLatConverterUtil.gcj_To_Gps84(amapLocation.getLatitude(), amapLocation.getLongitude());
                 if(!flag) {

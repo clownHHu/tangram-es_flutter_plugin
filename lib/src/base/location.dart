@@ -43,7 +43,10 @@ class AMapLocation {
   ///定位时间
   final num time;
 
-  const AMapLocation({
+  late bool locationflag;
+
+  AMapLocation({
+    this.locationflag=false,
     this.provider = '',
     required this.latLng,
     this.accuracy = 0,
@@ -68,6 +71,9 @@ class AMapLocation {
       time: json['time'],
     );
   }
+
+  ///日期转换
+  getTimeSinceEpoch()=>DateTime.fromMillisecondsSinceEpoch(time.toInt());
 
   /// Converts this object to something serializable in JSON.
   dynamic toJson() {

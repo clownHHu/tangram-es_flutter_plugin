@@ -1,4 +1,4 @@
-part of tangram_flutter_base;
+part of tangram_flutter_ui;
 
 class TopSection extends StatelessWidget {
   final Size size;
@@ -10,9 +10,9 @@ class TopSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: size.width,
-      height: size.height*0.55,
+      height: size.height,
       child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: children,
           ),

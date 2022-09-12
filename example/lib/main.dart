@@ -1,7 +1,8 @@
-import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:tangram_plugin/tangram_flutter_base.dart';
 import 'package:tangram_plugin/tangram_flutter_map.dart';
+import 'package:tangram_plugin/tangram_flutter_ui.dart';
 import 'configs.dart';
 
 void main() =>runApp( MaterialApp(home:MyApp() ,debugShowCheckedModeBanner: false,));
@@ -15,8 +16,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late TangramWidget tmap;
   late TMapController _mapController;
-  late AMapLocation location;
+  late AMapLocation location=AMapLocation(latLng: const LatLng(0,0),locationflag: false);
   double top = 0.0;
+
 
   @override
   void initState() {
@@ -39,85 +41,45 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final size =MediaQuery.of(context).size;
     return Scaffold(
-      //appBar: _appBar(),
       body: _stack(size),
-      // floatingActionButton: _floatingActionButton(),
-      // floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
-      // floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
   }
 
-  // AppBar _appBar(){
-  //   return AppBar(
-  //     //阴影设置为0
-  //     elevation: 0,
-  //     title: Text('Tangram'),
-  //     backgroundColor: Colors.transparent,
-  //     automaticallyImplyLeading:false,
-  //     actions: <Widget>[
-  //       // 非隐藏的菜单
-  //       IconButton(
-  //           color: Colors.black,
-  //           icon: const Icon(Icons.location_on),
-  //           tooltip: 'location switch',
-  //           onPressed: () async{
-  //             _mapController.locationSwitch();
-  //           }
-  //       ),
-  //     ],
-  //   );
-  // }
+
   Stack _stack(Size size){
-    double baseTop=size.height*0.6;
-    double searchBarHeight=54.0;
+    double baseTop=size.height*0.8;
+    double iconBarHeight=54.0;
     return Stack(
       children: <Widget>[
-        BackgroundImage(
+        BackgroundMap(
         mapWidget: Center(
            child: SizedBox(
              child: tmap,
            ),
          ),
         ),
-        _topSection(size),
+        _topSection(size,top,baseTop),
         GestureDetector(
           onPanUpdate: (DragUpdateDetails details) {
             final double scrollPos = details.globalPosition.dy;
-            if (scrollPos < baseTop && scrollPos > searchBarHeight) {
+            if (scrollPos < baseTop && scrollPos > iconBarHeight) {
               setState(() {
                 top = scrollPos;
               });
             }
           },
           child: DraggableSection(
-            top: this.top == 0.0 ? baseTop : this.top,
-            searchBarHeight: searchBarHeight,
+            top: top == 0.0 ? baseTop : top,
+            iconBarHeight: iconBarHeight,
+            icon: setIcon(top,baseTop),
+            location: location,
           ),
         ),
       ],
     );
   }
-  Row _floatingActionButton(){
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        FloatingActionButton(child: Text('fly'),
-          mini:true,
-          onPressed: () async {
-            CameraPosition cameraPosition=const CameraPosition(latlng:LatLng(39.909187, 116.397451),zoom: 15);
-            await _mapController.flyToPostion(cameraPosition);
-            //tangramView
-          },),
-        FloatingActionButton(child: Text('loc'),
-            mini:true,
-            onPressed: ()async{
-              await _mapController.flyToLoction();
-            }),
-      ],
 
-    );
-  }
-  Widget _topSection(Size size){
+  Widget _topSection(Size size,double top,double baseTop){
     final List<Widget> children=<Widget>[];
     children.add(
         FancyBar(
@@ -133,7 +95,7 @@ class _MyAppState extends State<MyApp> {
         FancyBar(
           width: 35,
           height: 35,
-          margin: const EdgeInsets.only(right: 20, top: 300),
+          margin: EdgeInsets.only(right: 20, top: (this.top-170>baseTop/2||this.top==0)?this.top==0?baseTop-170:this.top-170<baseTop-170?this.top-170:baseTop-170:baseTop/2),
           onTap: ()async{
             await _mapController.flyToLoction();
           },
@@ -143,14 +105,13 @@ class _MyAppState extends State<MyApp> {
         FancyBar(
           width: 35,
           height: 35,
-          margin: const EdgeInsets.only(right: 20),
+          margin: const EdgeInsets.only(right: 20,top: 10),
           onTap: ()async{
             CameraPosition cameraPosition=const CameraPosition(latlng:LatLng(39.909187, 116.397451),zoom: 15);
             await _mapController.flyToPostion(cameraPosition);
           },
           child: const Icon(Icons.account_balance, color: Colors.black, size: 20),)
     );
-
 
     return TopSection(size: size, children: children);
   }
@@ -163,8 +124,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _onLocationChanged(AMapLocation location) {
-    this.location=location;
-    print('_onLocationChanged ${location.toJson()}');
+    setState(() {
+      this.location=location;
+      this.location.locationflag=true;
+    });
+    // print('datetime:${this.location.getTimeSinceEpoch()}');
+    // print('_onLocationChanged ${this.location.toJson()}');
   }
 
   void _onCameraMove(CameraPosition cameraPosition) {
@@ -182,4 +147,18 @@ class _MyAppState extends State<MyApp> {
   void _onMapLongPress(String result) {
     print('_onMapLongPress===> $result');
   }
+
+
+  setIcon(double top,double baseTop) {
+      if(top==0||top>baseTop*0.7)
+      {
+        return const Icon(Icons.keyboard_arrow_up,size: 40,color: Colors.black,);
+      }
+      return const Icon(Icons.keyboard_arrow_down,size: 40,color: Colors.black,);
+
+  }
+
+
+
+
 }

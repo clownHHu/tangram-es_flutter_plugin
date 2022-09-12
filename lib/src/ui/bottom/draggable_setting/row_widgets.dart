@@ -1,4 +1,4 @@
-part of tangram_flutter_base;
+part of tangram_flutter_ui;
 
 class RowWidgets extends StatelessWidget {
   RowWidgets();
@@ -6,7 +6,7 @@ class RowWidgets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 16, left: 14),
+      margin: EdgeInsets.only(top: 40, left: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,

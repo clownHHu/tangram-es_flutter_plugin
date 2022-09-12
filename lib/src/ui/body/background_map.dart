@@ -1,8 +1,8 @@
-part of tangram_flutter_base;
+part of tangram_flutter_ui;
 
-class BackgroundImage extends StatelessWidget {
+class BackgroundMap extends StatelessWidget {
   final Widget mapWidget;
-  BackgroundImage({required this.mapWidget});
+  BackgroundMap({required this.mapWidget});
 
   @override
   Widget build(BuildContext context) {

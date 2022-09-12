@@ -1,4 +1,4 @@
-part of tangram_flutter_base;
+part of tangram_flutter_ui;
 
 class EventBar extends StatelessWidget {
   EventBar({required this.height, required this.baseTop});
