@@ -294,19 +294,11 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                 {
                     tMapLocation.setLocation(amapLocation);
 
-                    if (null != methodChannel) {
-                        final Map<String, Object> arguments = new HashMap<String, Object>(2);
-                        arguments.put("location",tMapLocation.locationToJson());
-                        arguments.put("navigation",tMapLocation.navigationToJson());
-                        methodChannel.invokeMethod(Const.METHOD_VIEW_LOCATION_CHANGED, arguments);
-                    }
-
                     if(tMapLocation.getMaxAltitude()<tMapLocation.getAltitude())
                         tMapLocation.setMaxAltitude(tMapLocation.getAltitude());
 
                     if(tMapLocation.getMinAltitude()>tMapLocation.getAltitude())
                         tMapLocation.setMinAltitude(tMapLocation.getAltitude());
-
 
                     LngLat lngLat = tMapLocation.toLngLat_Gcj_To_Gps84();
                     if(!tMapLocation.isFirstLocation()) {
@@ -316,7 +308,19 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                         mapController.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
                     }
                     mapController.addMarkerBySrting(lngLat);
+
+                    if (null != methodChannel) {
+                        final Map<String, Object> arguments = new HashMap<String, Object>(2);
+                        arguments.put("location",tMapLocation.locationToJson());
+                        methodChannel.invokeMethod(Const.METHOD_VIEW_LOCATION_CHANGED, arguments);
+
+                        arguments.clear();
+                        arguments.put("navigation",tMapLocation.navigationToJson());
+                        methodChannel.invokeMethod(Const.METHOD_VIEW_ON_NAVIGATION,arguments);
+
+                    }
                 }
+
             } else {
                 //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
                 Log.e("AmapError","location Error, ErrCode:"

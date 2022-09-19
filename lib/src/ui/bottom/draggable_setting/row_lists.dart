@@ -261,7 +261,7 @@ class RowLists extends StatelessWidget {
                       margin: const EdgeInsets.all(5),
                       child: Text(
                         location.locationflag == true
-                            ? location.speed.toStringAsFixed(3)
+                            ? navigation.distance.toStringAsFixed(3)
                             : '-',
                         textAlign: TextAlign.center,
                         style:
@@ -287,7 +287,7 @@ class RowLists extends StatelessWidget {
                             margin: const EdgeInsets.all(5),
                             child: Text(
                               location.locationflag == true
-                                  ? location.getTimeSinceEpoch().toString()
+                                  ? navigation.time.toString()
                                   : '-',
                               textAlign: TextAlign.center,
                               style: const TextStyle(

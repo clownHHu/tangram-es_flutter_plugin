@@ -102,9 +102,11 @@ public class TMapLocation {
         return json;
     }
     public final Map<String, Object> navigationToJson(){
+        distance=speedNum*averSpeed;
         Map<String, Object> json = new HashMap<String, Object>(2);
         json.put("averSpeed",averSpeed);
         json.put("distance",distance);
+        json.put("time",speedNum);
         json.put("maxAltitude",maxAltitude);
         json.put("minAltitude",minAltitude);
         json.put("upAltitude",initAltitude==-200?0:maxAltitude-initAltitude);

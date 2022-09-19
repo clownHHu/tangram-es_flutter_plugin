@@ -44,6 +44,11 @@ class TMapController{
           .onLocationChanged()
           .listen((LocationChangedEvent e) => _mapState.widget.onLocationChanged!(e.value));
     }
+    if(_mapState.widget.onNavigation != null){
+      _methodChannel
+          .onNavigation()
+          .listen((NavigationEvent e)=>_mapState.widget.onNavigation!(e.value));
+    }
 
     if (_mapState.widget.onCameraMove != null) {
       _methodChannel

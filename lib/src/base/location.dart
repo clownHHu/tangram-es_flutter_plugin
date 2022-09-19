@@ -163,7 +163,7 @@ class LatLng {
 enum LocationModes { High, Medium, Low }
 
 class Navigation {
-  final String time;
+  final int time;
   final double distance;
   final double upAltitude;
   final double downAltitude;
@@ -171,7 +171,7 @@ class Navigation {
   final double minAltitude;
   final double averSpeed;
   Navigation(
-      {this.time = "00:00:00",
+      {this.time = 0,
       this.distance = 0,
       this.upAltitude = 0,
       this.downAltitude = 0,
@@ -189,6 +189,7 @@ class Navigation {
       downAltitude: json['downAltitude'],
       maxAltitude: json['maxAltitude'],
       minAltitude: json['minAltitude'],
+      time: json['time']
     );
   }
 }

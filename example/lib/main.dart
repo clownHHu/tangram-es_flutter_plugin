@@ -146,14 +146,14 @@ class _MyAppState extends State<MyApp> {
     });
     // this.location=location;
     // this.location.locationflag=true;
+
   }
   void _onNavigation(Navigation navigation) {
-    if(navFlag){
-      setState(() {
-        this.navigation=navigation;
-      });
-      print(this.navigation.averSpeed);
-    }
+      if(navFlag) {
+        setState(() {
+          this.navigation=navigation;
+        });
+      }
   }
 
   void _onCameraMove(CameraPosition cameraPosition) {

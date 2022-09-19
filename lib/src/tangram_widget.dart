@@ -73,7 +73,7 @@ class TangramWidget extends StatefulWidget{
 
     this.LocationMode= LocationModes.High,
     this.privacyStatement,
-    this.interval=2000,
+    this.interval=1000,
     this.ampApiKey,
     this.isLocation=true,
     this.isNeedAddress=true,
