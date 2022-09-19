@@ -1,4 +1,5 @@
 part of tangram_flutter_base;
+
 ///定位信息类
 ///
 ///可提供内容包括：
@@ -46,7 +47,7 @@ class AMapLocation {
   late bool locationflag;
 
   AMapLocation({
-    this.locationflag=false,
+    this.locationflag = false,
     this.provider = '',
     required this.latLng,
     this.accuracy = 0,
@@ -73,7 +74,7 @@ class AMapLocation {
   }
 
   ///日期转换
-  getTimeSinceEpoch()=>DateTime.fromMillisecondsSinceEpoch(time.toInt());
+  getTimeSinceEpoch() => DateTime.fromMillisecondsSinceEpoch(time.toInt());
 
   /// Converts this object to something serializable in JSON.
   dynamic toJson() {
@@ -84,6 +85,7 @@ class AMapLocation {
         json[fieldName] = value;
       }
     }
+
     json['latlng'] = latLng.toJson();
     addIfPresent('provider', provider);
     addIfPresent('accuracy', accuracy);
@@ -125,7 +127,7 @@ class LatLng {
   /// [latitude]取值范围 [-180.0,179.0]
   const LatLng(double latitude, double longitude)
       : latitude =
-  (latitude < -90.0 ? -90.0 : (90.0 < latitude ? 90.0 : latitude)),
+            (latitude < -90.0 ? -90.0 : (90.0 < latitude ? 90.0 : latitude)),
         longitude = (longitude + 180.0) % 360.0 - 180.0;
 
   /// 纬度
@@ -157,8 +159,36 @@ class LatLng {
   @override
   int get hashCode => hashValues(latitude, longitude);
 }
-enum LocationModes{
-  High,
-  Medium,
-  Low
+
+enum LocationModes { High, Medium, Low }
+
+class Navigation {
+  final String time;
+  final double distance;
+  final double upAltitude;
+  final double downAltitude;
+  final double maxAltitude;
+  final double minAltitude;
+  final double averSpeed;
+  Navigation(
+      {this.time = "00:00:00",
+      this.distance = 0,
+      this.upAltitude = 0,
+      this.downAltitude = 0,
+      this.maxAltitude = 0,
+      this.minAltitude = 0,
+      this.averSpeed = 0});
+  static Navigation? fromMap(dynamic json) {
+    if (json == null) {
+      return null;
+    }
+    return Navigation(
+      averSpeed: json['averSpeed'],
+      distance: json['distance'],
+      upAltitude: json['upAltitude'],
+      downAltitude: json['downAltitude'],
+      maxAltitude: json['maxAltitude'],
+      minAltitude: json['minAltitude'],
+    );
+  }
 }

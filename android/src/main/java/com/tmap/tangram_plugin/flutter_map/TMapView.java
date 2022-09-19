@@ -28,6 +28,7 @@ import com.mapzen.tangram.networking.DefaultHttpHandler;
 import com.mapzen.tangram.networking.HttpHandler;
 import com.mapzen.tangram.viewholder.GLSurfaceViewHolderFactory;
 import com.tmap.tangram_plugin.R;
+import com.tmap.tangram_plugin.flutter_map.base.TMapLocation;
 import com.tmap.tangram_plugin.flutter_map.core.TMapController;
 import com.tmap.tangram_plugin.flutter_map.lifecycle.LifecycleProvider;
 import com.tmap.tangram_plugin.flutter_map.tool.Const;
@@ -66,9 +67,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     private MapView view;
     private Context context;
     private boolean disposed = false;
-    boolean flag=false;
-    boolean locationflag=false;
-    private long predate=-1;
+    private TMapLocation tMapLocation=new TMapLocation();
     //声明AMapLocationClient类对象
     private AMapLocationClient mlocationClient = null;
 
@@ -102,11 +101,17 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
         }
     }
 
-    public void startLocation(AMapLocationClient mlocationClient) {
+
+    public void initLocation(AMapLocationClient mlocationClient) {
         this.mlocationClient=mlocationClient;
         this.mlocationClient.setLocationListener(this);
-        this.mlocationClient.startLocation();
-        locationflag=true;
+        tMapLocation.setInitAltitude(-200);
+        tMapLocation.setMaxAltitude(-666);
+        tMapLocation.setMinAltitude(6666);
+    }
+    public void startLocation(){
+        mlocationClient.startLocation();
+        tMapLocation.setLocationFlag(true);
     }
 
 
@@ -137,6 +142,8 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             methodChannel.setMethodCallHandler(null);
             view=null;
             disposed = true;
+            tMapLocation=null;
+            mlocationClient=null;
         } catch (Throwable e) {
             LogUtil.e(CLASS_NAME, "dispose", e);
         }
@@ -217,7 +224,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             if (null != view) {
                 view.onResume();
                 mlocationClient.startLocation();
-                locationflag=true;
+                tMapLocation.setLocationFlag(true);
             }
         } catch (Throwable e) {
             LogUtil.e(CLASS_NAME, "onResume", e);
@@ -233,7 +240,8 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             }
             view.onPause();
             mlocationClient.stopLocation();
-            locationflag=false;
+            tMapLocation.setLocationFlag(false);
+
         } catch (Throwable e) {
             LogUtil.e(CLASS_NAME, "onPause", e);
         }
@@ -248,7 +256,8 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
             }
             view.onPause();
             mlocationClient.stopLocation();
-            locationflag=false;
+            tMapLocation.setLocationFlag(false);
+
         } catch (Throwable e) {
             LogUtil.e(CLASS_NAME, "onStop", e);
         }
@@ -280,40 +289,34 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     public void onLocationChanged(AMapLocation amapLocation) {
         if (amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                if(predate!=-1&&predate!=amapLocation.getTime())
+                ////定位数据
+                if(tMapLocation.getTime()==0||tMapLocation.locationChanged(amapLocation.getTime()))
                 {
-                    if (null != methodChannel) {
-                        final Map<String, Object> location = new HashMap<String, Object>(2);
-                        ArrayList<Double> arrayList=new ArrayList<Double>();
-                        arrayList.add(amapLocation.getLatitude());
-                        arrayList.add(amapLocation.getLongitude());
-                        location.put("latLng", arrayList);
-                        location.put("provider",amapLocation.getProvider());
-                        location.put("accuracy",amapLocation.getAccuracy());
-                        location.put("altitude",amapLocation.getAltitude());
-                        location.put("bearing",amapLocation.getBearing());
-                        location.put("speed",amapLocation.getSpeed());
-                        location.put("time",amapLocation.getTime());
+                    tMapLocation.setLocation(amapLocation);
 
+                    if (null != methodChannel) {
                         final Map<String, Object> arguments = new HashMap<String, Object>(2);
-                        arguments.put("location", location);
+                        arguments.put("location",tMapLocation.locationToJson());
+                        arguments.put("navigation",tMapLocation.navigationToJson());
                         methodChannel.invokeMethod(Const.METHOD_VIEW_LOCATION_CHANGED, arguments);
                     }
-                }
 
-                Date date = new Date(amapLocation.getTime());
-                predate=amapLocation.getTime();
-                if(!locationflag)
-                    System.out.println(df.format(date));
-                LngLat lngLat = LngLatConverterUtil.gcj_To_Gps84(amapLocation.getLatitude(), amapLocation.getLongitude());
-                if(!flag) {
-                    flag=true;
-                    mapController.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
-                }
-                mapController.addMarkerBySrting(lngLat);
+                    if(tMapLocation.getMaxAltitude()<tMapLocation.getAltitude())
+                        tMapLocation.setMaxAltitude(tMapLocation.getAltitude());
 
+                    if(tMapLocation.getMinAltitude()>tMapLocation.getAltitude())
+                        tMapLocation.setMinAltitude(tMapLocation.getAltitude());
+
+
+                    LngLat lngLat = tMapLocation.toLngLat_Gcj_To_Gps84();
+                    if(!tMapLocation.isFirstLocation()) {
+                        tMapLocation.setFirstLocation(true);
+                        if(tMapLocation.getInitAltitude()==-200&&tMapLocation.getAltitude()!=0)
+                            tMapLocation.setInitAltitude(tMapLocation.getAltitude());
+                        mapController.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
+                    }
+                    mapController.addMarkerBySrting(lngLat);
+                }
             } else {
                 //显示错误信息ErrCode是错误码，errInfo是错误信息，详见错误码表。
                 Log.e("AmapError","location Error, ErrCode:"
@@ -330,10 +333,10 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
         {
             switch (call.method){
                 case Const.METHOD_VIEW_FLY_LOCATION:
-                    flag=false;
+                    tMapLocation.setFirstLocation(false);
                     break;
                 case Const.METHOD_VIEW_LOCATION_SWITCH:
-                    if(locationflag) {
+                    if(tMapLocation.isLocationFlag()) {
                         mlocationClient.stopLocation();
                         Toast.makeText(context,"停止导航",Toast.LENGTH_SHORT).show();
                     }
@@ -341,7 +344,7 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                         mlocationClient.startLocation();
                         Toast.makeText(context,"开始导航",Toast.LENGTH_SHORT).show();
                     }
-                    locationflag=!locationflag;
+                    tMapLocation.setLocationFlag(!tMapLocation.isLocationFlag());
                     break;
                 default:
                     LogUtil.w(CLASS_NAME, "onMethodCall not find methodId:" + call.method);

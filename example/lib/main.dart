@@ -17,7 +17,10 @@ class _MyAppState extends State<MyApp> {
   late TangramWidget tmap;
   late TMapController _mapController;
   late AMapLocation location=AMapLocation(latLng: const LatLng(0,0),locationflag: false);
+  late Navigation navigation=Navigation();
+  late bool navFlag=false;
   double top = 0.0;
+  int listIndex=0;
 
 
   @override
@@ -33,6 +36,7 @@ class _MyAppState extends State<MyApp> {
       onCameraMoveEnd: _onCameraMoveEnd,
       onLongPress: _onMapLongPress,
       onTap: _onMapTap,
+      onNavigation: _onNavigation,
     );
   }
 
@@ -73,6 +77,10 @@ class _MyAppState extends State<MyApp> {
             iconBarHeight: iconBarHeight,
             icon: setIcon(top,baseTop),
             location: location,
+            navigation: navigation,
+            index: listIndex,
+            changeListIndex: _changeListIndex,
+            onNavigation: _navigationSwitch,
           ),
         ),
       ],
@@ -122,14 +130,30 @@ class _MyAppState extends State<MyApp> {
     });
     _mapController.getlocationPermission();
   }
+  void _changeListIndex(index){
+    setState((){
+      listIndex=index;
+    });
+  }
+  void _navigationSwitch(){
+    navFlag=!navFlag;
+  }
 
   void _onLocationChanged(AMapLocation location) {
     setState(() {
       this.location=location;
       this.location.locationflag=true;
     });
-    // print('datetime:${this.location.getTimeSinceEpoch()}');
-    // print('_onLocationChanged ${this.location.toJson()}');
+    // this.location=location;
+    // this.location.locationflag=true;
+  }
+  void _onNavigation(Navigation navigation) {
+    if(navFlag){
+      setState(() {
+        this.navigation=navigation;
+      });
+      print(this.navigation.averSpeed);
+    }
   }
 
   void _onCameraMove(CameraPosition cameraPosition) {
@@ -157,6 +181,8 @@ class _MyAppState extends State<MyApp> {
       return const Icon(Icons.keyboard_arrow_down,size: 40,color: Colors.black,);
 
   }
+
+
 
 
 

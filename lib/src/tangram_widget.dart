@@ -51,6 +51,8 @@ class TangramWidget extends StatefulWidget{
   final ArgumentCallback<String>? onLongPress;
   ///位置回调
   final ArgumentCallback<AMapLocation>? onLocationChanged;
+  ///导航回调
+  final ArgumentCallback<Navigation>? onNavigation;
 
     TangramWidget({
     Key? key,
@@ -77,6 +79,7 @@ class TangramWidget extends StatefulWidget{
     this.isNeedAddress=true,
 
     this.onLocationChanged,
+    this.onNavigation,
     this.onCameraMove,
     this.onCameraMoveEnd,
     this.onLongPress,

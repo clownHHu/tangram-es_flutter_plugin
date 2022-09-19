@@ -1,4 +1,4 @@
-package com.tmap.tangram_plugin.flutter_map.core;
+package com.tmap.tangram_plugin.flutter_map.base;
 
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;

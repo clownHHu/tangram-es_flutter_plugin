@@ -2,25 +2,11 @@ package com.tmap.tangram_plugin.flutter_map;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.amap.api.location.AMapLocationClient;
-import com.mapzen.tangram.CameraPosition;
-import com.mapzen.tangram.CameraUpdate;
-import com.mapzen.tangram.CameraUpdateFactory;
 import com.mapzen.tangram.LngLat;
-import com.mapzen.tangram.MapController;
-import com.mapzen.tangram.SceneUpdate;
 import com.tmap.tangram_plugin.flutter_map.core.TMapController;
-import com.tmap.tangram_plugin.flutter_map.core.TMapOption;
-import com.tmap.tangram_plugin.flutter_map.core.TMapOptionInterface;
+import com.tmap.tangram_plugin.flutter_map.base.TMapOption;
 import com.tmap.tangram_plugin.flutter_map.lifecycle.LifecycleProvider;
 import com.tmap.tangram_plugin.flutter_map.tool.LogUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import io.flutter.plugin.common.BinaryMessenger;
 
@@ -41,11 +27,10 @@ public class TMapBuilder {
             tMapController.loadSceneFileAsync(tMapOption.getPath(),tMapOption.getSceneUpdates());
 
             //调用高德定位
-//            AMapLocationClient.updatePrivacyShow(context,true,true);
-//            AMapLocationClient.updatePrivacyAgree(context,true);
             tMapOption.getaMapLocationClient().setLocationOption(tMapOption.getaMapLocationClientOption());
-            tMapView.startLocation(tMapOption.getaMapLocationClient());
-
+            tMapView.initLocation(tMapOption.getaMapLocationClient());
+            if(tMapOption.isLocation())
+                tMapView.startLocation();
             /////////////对MapController属性初始化
             tMapController.addDataLayer(tMapOption.getDataLayer());
             tMapController.setpointStylingPath(tMapOption.getPointStylingPath());

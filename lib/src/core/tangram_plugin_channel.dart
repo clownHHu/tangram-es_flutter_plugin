@@ -133,6 +133,11 @@ class MethodChannelTangram extends TangramFlutterPlatform{
     return _events().whereType<LocationChangedEvent>();
   }
 
+  ///导航回调
+  Stream<NavigationEvent> onNavigation(){
+    return _events().whereType<NavigationEvent>();
+  }
+
   ///Camera 移动回调
   Stream<CameraPositionMoveEvent> onCameraMove() {
     return _events().whereType<CameraPositionMoveEvent>();
@@ -173,7 +178,14 @@ class MethodChannelTangram extends TangramFlutterPlatform{
           print("view#locationChanged error=======>" + e.toString());
         }
         break;
-
+      case 'view#onNavigation':
+        try {
+          _mapEventStreamController.add(NavigationEvent(
+              Navigation.fromMap(call.arguments['navigation'])!));
+        } catch (e) {
+          print("view#onNavigation error=======>" + e.toString());
+        }
+        break;
       case 'camera#onMove':
         try {
           _mapEventStreamController.add(CameraPositionMoveEvent(

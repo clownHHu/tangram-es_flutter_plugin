@@ -16,7 +16,10 @@ class MapEvent<T> {
 class LocationChangedEvent extends MapEvent<AMapLocation> {
   LocationChangedEvent(AMapLocation value) : super(value);
 }
-
+///定位回调接口
+class NavigationEvent extends MapEvent<Navigation> {
+  NavigationEvent(Navigation value) : super(value);
+}
 ///地图移动回调
 class CameraPositionMoveEvent extends MapEvent<CameraPosition> {
   CameraPositionMoveEvent(CameraPosition value)

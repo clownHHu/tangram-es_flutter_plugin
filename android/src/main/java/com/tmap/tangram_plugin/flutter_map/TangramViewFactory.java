@@ -1,22 +1,17 @@
 package com.tmap.tangram_plugin.flutter_map;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.mapzen.tangram.CameraPosition;
-import com.mapzen.tangram.CameraUpdateFactory;
-import com.mapzen.tangram.LngLat;
 import com.mapzen.tangram.SceneUpdate;
-import com.tmap.tangram_plugin.flutter_map.core.TMapOption;
+import com.tmap.tangram_plugin.flutter_map.base.TMapOption;
 import com.tmap.tangram_plugin.flutter_map.lifecycle.LifecycleProvider;
-import com.tmap.tangram_plugin.flutter_map.tool.LngLatConverterUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.StandardMessageCodec;
@@ -71,34 +66,31 @@ public class TangramViewFactory extends PlatformViewFactory {
             tMapOption.setDataLayer((String) options.get("dataLayer"));
             tMapOption.setPointStylingPath((String) options.get("pointStylingPath"));
             tMapOption.setLocation((Boolean) options.get("isLocation"));
-            if(tMapOption.isLocation())
-            {
-                AMapLocationClientOption aMapLocationClientOption=new AMapLocationClientOption();
-                aMapLocationClientOption.setNeedAddress((Boolean) options.get("isNeedAddress"));
-                switch ((Integer) options.get("LocationMode")){
-                    case 0:
-                        aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-                        break;
-                    case 1:
-                        aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
-                        break;
-                    case 2:
-                        aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
-                        break;
-                    default:
-                        aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-                }
-                aMapLocationClientOption.setInterval((Integer)options.get("interval"));
-                tMapOption.setaMapLocationClientOption(aMapLocationClientOption);
-                try {
-                    AMapLocationClient aMapLocationClient=new AMapLocationClient(context);
-                    aMapLocationClient.setApiKey(tMapOption.getAmpApikey());
-                    //aMapLocationClient.setLocationOption(aMapLocationClientOption);
-                    tMapOption.setaMapLocationClient(aMapLocationClient);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            /**
+             * 配置高德定位参数
+             */
+            AMapLocationClientOption aMapLocationClientOption=new AMapLocationClientOption();
+            aMapLocationClientOption.setNeedAddress((Boolean) options.get("isNeedAddress"));
+            switch ((Integer) options.get("LocationMode")){
+                case 1:
+                    aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
+                    break;
+                case 2:
+                    aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
+                    break;
+                default:
+                    aMapLocationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
             }
+            aMapLocationClientOption.setInterval((Integer)options.get("interval"));
+            tMapOption.setaMapLocationClientOption(aMapLocationClientOption);
+            try {
+                AMapLocationClient aMapLocationClient=new AMapLocationClient(context);
+                aMapLocationClient.setApiKey(tMapOption.getAmpApikey());
+                tMapOption.setaMapLocationClient(aMapLocationClient);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
         if(params.containsKey("cameraPosition")){
             options= (Map<String, Object>) params.get("cameraPosition");
