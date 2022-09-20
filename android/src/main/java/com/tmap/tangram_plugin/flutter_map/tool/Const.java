@@ -27,12 +27,13 @@ public class Const {
     public static final String METHOD_VIEW_LOCATION_CHANGED= "view#locationChanged";
     public static final String METHOD_VIEW_LOCATION_SWITCH= "view#locationSwitch";
     public static final String METHOD_VIEW_ON_NAVIGATION= "view#onNavigation";
-
+    public static final String METHOD_VIEW_NAVIGATION_SWITCH= "view#navigationSwitch";
     public static final String[] METHOD_ID_LIST_FOR_VIEW = {
             METHOD_VIEW_FLY_LOCATION,
             METHOD_VIEW_LOCATION_CHANGED,
             METHOD_VIEW_LOCATION_SWITCH,
-            METHOD_VIEW_ON_NAVIGATION
+            METHOD_VIEW_ON_NAVIGATION,
+            METHOD_VIEW_NAVIGATION_SWITCH
     };
 
     /**

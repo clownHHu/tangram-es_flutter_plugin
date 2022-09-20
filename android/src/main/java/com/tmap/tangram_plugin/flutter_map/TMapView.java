@@ -314,10 +314,11 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                         arguments.put("location",tMapLocation.locationToJson());
                         methodChannel.invokeMethod(Const.METHOD_VIEW_LOCATION_CHANGED, arguments);
 
-                        arguments.clear();
-                        arguments.put("navigation",tMapLocation.navigationToJson());
-                        methodChannel.invokeMethod(Const.METHOD_VIEW_ON_NAVIGATION,arguments);
-
+                        if(tMapLocation.isNavigationFlag()){
+                            arguments.clear();
+                            arguments.put("navigation",tMapLocation.navigationToJson());
+                            methodChannel.invokeMethod(Const.METHOD_VIEW_ON_NAVIGATION,arguments);
+                        }
                     }
                 }
 
@@ -342,10 +343,21 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                 case Const.METHOD_VIEW_LOCATION_SWITCH:
                     if(tMapLocation.isLocationFlag()) {
                         mlocationClient.stopLocation();
-                        Toast.makeText(context,"停止导航",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,"停止定位",Toast.LENGTH_SHORT).show();
                     }
                     else {
                         mlocationClient.startLocation();
+                        Toast.makeText(context,"开始定位",Toast.LENGTH_SHORT).show();
+                    }
+                    tMapLocation.setLocationFlag(!tMapLocation.isLocationFlag());
+                    break;
+                case Const.METHOD_VIEW_NAVIGATION_SWITCH:
+                    if(tMapLocation.isNavigationFlag()) {
+                        tMapLocation.setNavigationFlag(false);
+                        Toast.makeText(context,"停止导航",Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        tMapLocation.setNavigationFlag(true);
                         Toast.makeText(context,"开始导航",Toast.LENGTH_SHORT).show();
                     }
                     tMapLocation.setLocationFlag(!tMapLocation.isLocationFlag());

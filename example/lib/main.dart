@@ -22,7 +22,6 @@ class _MyAppState extends State<MyApp> {
   late TMapController _mapController;
   late AMapLocation location=AMapLocation(latLng: const LatLng(0,0),locationflag: false);
   late Navigation navigation=Navigation();
-  late bool navFlag=false;
   final CounterStorage storage=CounterStorage();
   var timeList=<int>[];
   var speedList=<double>[];
@@ -145,8 +144,8 @@ class _MyAppState extends State<MyApp> {
       listIndex=index;
     });
   }
-  void _navigationSwitch(){
-    navFlag=!navFlag;
+  Future<void> _navigationSwitch() async {
+    _mapController.navigationSwitch();
     storage.readContents().then((value) {
       log("content:$value");
       // print("content:$value");
@@ -167,15 +166,13 @@ class _MyAppState extends State<MyApp> {
 
   }
   void _onNavigation(Navigation navigation) {
-    // if(navFlag) {
-        setState(() {
-          this.navigation=navigation;
-          timeList.add(this.navigation.time);
-          averSpeedList.add(this.navigation.averSpeed);
-          speedList.add(location.speed);
-          distanceList.add(this.navigation.distance);
-        });
-    // }
+      setState(() {
+        this.navigation=navigation;
+        timeList.add(this.navigation.time);
+        averSpeedList.add(this.navigation.averSpeed);
+        speedList.add(location.speed);
+        distanceList.add(this.navigation.distance);
+      });
   }
 
   void _onCameraMove(CameraPosition cameraPosition) {

@@ -54,7 +54,9 @@ class MethodChannelTangram extends TangramFlutterPlatform{
   Future<void> locationSwitch()async{
     await methodChannel.invokeMethod('view#locationSwitch');
   }
-
+  Future<void> navigationSwitch()async{
+    await methodChannel.invokeMethod('view#navigationSwitch');
+  }
   @override
   void dispose() {}
 

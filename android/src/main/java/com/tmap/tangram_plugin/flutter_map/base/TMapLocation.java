@@ -20,10 +20,13 @@ public class TMapLocation {
     private double bearing;
     private double speed;
     private long time;
-
+    //开启（关闭）定位
     private boolean locationFlag;
+    //有效定位
     private boolean locationChanged;
     private boolean firstLocation;
+
+    private boolean navigationFlag;
     private ArrayList<Double> speedList;
     private double averSpeed;
     private double initAltitude;
@@ -41,8 +44,10 @@ public class TMapLocation {
        this.speed=amapLocation.getSpeed();
        this.time=amapLocation.getTime();
        this.provider=amapLocation.getProvider();
-       setSpeedList(speed);
-       this.averSpeed=calAverSpeed();
+       if(navigationFlag){
+           setSpeedList(speed);
+           this.averSpeed=calAverSpeed();
+       }
     }
     public boolean locationChanged(long now){
         if(time!=0)
@@ -92,13 +97,6 @@ public class TMapLocation {
         json.put("bearing",bearing);
         json.put("speed",speed);
         json.put("time",time);
-
-//        json.put("averSpeed",averSpeed);
-//        json.put("initAltitude",initAltitude);
-//        json.put("distance",distance);
-//        json.put("maxAltitude",maxAltitude);
-//        json.put("minAltitude",minAltitude);
-
         return json;
     }
     public final Map<String, Object> navigationToJson(){
@@ -114,9 +112,18 @@ public class TMapLocation {
         return json;
     }
 
+
+
     /**
      * setter,getter
      * **/
+    public boolean isNavigationFlag() {
+        return navigationFlag;
+    }
+
+    public void setNavigationFlag(boolean navigationFlag) {
+        this.navigationFlag = navigationFlag;
+    }
     public double getMaxAltitude() {
         return maxAltitude;
     }

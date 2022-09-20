@@ -88,5 +88,7 @@ class TMapController{
   Future<void> locationSwitch(){
     return _methodChannel.locationSwitch();
   }
-
+  Future<void> navigationSwitch(){
+    return _methodChannel.navigationSwitch();
+  }
 }
