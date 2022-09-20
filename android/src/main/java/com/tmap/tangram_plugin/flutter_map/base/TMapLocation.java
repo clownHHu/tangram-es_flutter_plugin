@@ -162,7 +162,7 @@ public class TMapLocation {
         if(speedList.size()>=100)
         {
             speedList.clear();
-            speedList.add(averSpeed);
+            speedList.add(averSpeed*100);
         }
 
         speedList.add(speed);

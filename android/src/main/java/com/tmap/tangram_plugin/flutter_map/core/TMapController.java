@@ -322,7 +322,7 @@ public class TMapController implements MyMethodCallHandler,TMapOptionInterface, 
             map.setMapChangeListener(new MapChangeListener() {
                 @Override
                 public void onViewComplete() {
-                    System.out.println(CLASS_NAME+ "View complete");
+                    //System.out.println(CLASS_NAME+ "View complete");
                 }
 
                 @Override

@@ -8,6 +8,7 @@ class DraggableSection extends StatelessWidget {
   final Navigation navigation;
   final Function changeListIndex;
   final Function onNavigation;
+  final Function writeData;
   final int index;
 
   DraggableSection(
@@ -18,7 +19,8 @@ class DraggableSection extends StatelessWidget {
       required this.navigation,
       required this.changeListIndex,
       required this.index,
-      required this.onNavigation});
+      required this.onNavigation,
+      required this.writeData});
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class DraggableSection extends StatelessWidget {
               //RowImages(),
               // RowEvents(),
               RowLists(
+                writeData: writeData,
                 onNavigation: onNavigation,
                 navigation: navigation,
                 location: location,

@@ -1,5 +1,9 @@
 
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tangram_plugin/src/tool/counter_storage.dart';
 import 'package:tangram_plugin/tangram_flutter_base.dart';
 import 'package:tangram_plugin/tangram_flutter_map.dart';
 import 'package:tangram_plugin/tangram_flutter_ui.dart';
@@ -19,6 +23,11 @@ class _MyAppState extends State<MyApp> {
   late AMapLocation location=AMapLocation(latLng: const LatLng(0,0),locationflag: false);
   late Navigation navigation=Navigation();
   late bool navFlag=false;
+  final CounterStorage storage=CounterStorage();
+  var timeList=<int>[];
+  var speedList=<double>[];
+  var averSpeedList=<double>[];
+  var distanceList=<double>[];
   double top = 0.0;
   int listIndex=0;
 
@@ -81,6 +90,7 @@ class _MyAppState extends State<MyApp> {
             index: listIndex,
             changeListIndex: _changeListIndex,
             onNavigation: _navigationSwitch,
+            writeData: _writeData,
           ),
         ),
       ],
@@ -137,6 +147,14 @@ class _MyAppState extends State<MyApp> {
   }
   void _navigationSwitch(){
     navFlag=!navFlag;
+    storage.readContents().then((value) {
+      log("content:$value");
+      // print("content:$value");
+    });
+  }
+  void _writeData(){
+    print("writeData");
+    storage.writeData(timeList,speedList,averSpeedList,distanceList);
   }
 
   void _onLocationChanged(AMapLocation location) {
@@ -149,11 +167,15 @@ class _MyAppState extends State<MyApp> {
 
   }
   void _onNavigation(Navigation navigation) {
-      if(navFlag) {
+    // if(navFlag) {
         setState(() {
           this.navigation=navigation;
+          timeList.add(this.navigation.time);
+          averSpeedList.add(this.navigation.averSpeed);
+          speedList.add(location.speed);
+          distanceList.add(this.navigation.distance);
         });
-      }
+    // }
   }
 
   void _onCameraMove(CameraPosition cameraPosition) {

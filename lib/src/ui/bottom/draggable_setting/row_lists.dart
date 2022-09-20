@@ -1,10 +1,11 @@
 part of tangram_flutter_ui;
 
 class RowLists extends StatelessWidget {
-  RowLists({required this.location, required this.listIndex,required this.navigation,required this.onNavigation});
+  RowLists({required this.location, required this.listIndex,required this.navigation,required this.onNavigation,required this.writeData});
   final AMapLocation location;
   final Navigation navigation;
   final Function onNavigation;
+  final Function writeData;
   final int listIndex;
   @override
   Widget build(BuildContext context) {
@@ -224,6 +225,9 @@ class RowLists extends StatelessWidget {
                 ElevatedButton(
                   onPressed: (){
                     onNavigation();
+                  },
+                  onLongPress: (){
+                    writeData();
                   },
                   style: ButtonStyle(
                     backgroundColor:
