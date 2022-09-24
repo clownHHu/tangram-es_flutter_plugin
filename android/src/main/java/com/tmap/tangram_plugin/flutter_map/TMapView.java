@@ -70,7 +70,6 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
     private TMapLocation tMapLocation=new TMapLocation();
     //声明AMapLocationClient类对象
     private AMapLocationClient mlocationClient = null;
-
     TMapView(int id,
                      Context context,
                      BinaryMessenger binaryMessenger,
@@ -297,17 +296,19 @@ public class TMapView implements DefaultLifecycleObserver, ActivityPluginBinding
                     if(tMapLocation.getMaxAltitude()<tMapLocation.getAltitude())
                         tMapLocation.setMaxAltitude(tMapLocation.getAltitude());
 
-                    if(tMapLocation.getMinAltitude()>tMapLocation.getAltitude())
+                    if((tMapLocation.getMinAltitude()>tMapLocation.getAltitude())&&tMapLocation.getAltitude()!=0)
                         tMapLocation.setMinAltitude(tMapLocation.getAltitude());
 
                     LngLat lngLat = tMapLocation.toLngLat_Gcj_To_Gps84();
                     if(!tMapLocation.isFirstLocation()) {
                         tMapLocation.setFirstLocation(true);
-                        if(tMapLocation.getInitAltitude()==-200&&tMapLocation.getAltitude()!=0)
-                            tMapLocation.setInitAltitude(tMapLocation.getAltitude());
                         mapController.updateCameraPosition(CameraUpdateFactory.newLngLatZoom(lngLat,18));
                     }
                     mapController.addMarkerBySrting(lngLat);
+
+                    if(tMapLocation.getInitAltitude()==-200&&tMapLocation.getAltitude()!=0) {
+                        tMapLocation.setInitAltitude(tMapLocation.getAltitude());
+                    }
 
                     if (null != methodChannel) {
                         final Map<String, Object> arguments = new HashMap<String, Object>(2);
